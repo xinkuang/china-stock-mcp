@@ -103,7 +103,7 @@ Add the following configuration to the MCP server configuration file:
             "/path/to/akshare-one-mcp",
             "run",
             "main.py"
-        ],
+        ]
     }
 }
 ```
