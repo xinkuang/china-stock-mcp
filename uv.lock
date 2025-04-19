@@ -111,15 +111,15 @@ wheels = [
 
 [[package]]
 name = "akshare-one"
-version = "0.1.0"
+version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "akshare" },
     { name = "cachetools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cb/82/a1465aeeef70c9691528d6ae4d03eca017bc217cdd56ea35dd778e5737b9/akshare_one-0.1.0.tar.gz", hash = "sha256:ae1605cdd6917af21237ebbe754c8241c598769c6fc3c3ab064ed038db5f6842", size = 12110 }
+sdist = { url = "https://files.pythonhosted.org/packages/0c/78/5cf2fcead1967ad1b0f7d2b9c46d2ffcbdab0de62698cdc63979785e61f4/akshare_one-0.1.2.tar.gz", hash = "sha256:799c052e8612e87931e7f5750116a898641911035e7116e0d2446e0b87daec97", size = 11468 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/84/dc/767663144b7bf45f43be5b41d459755b26b361612a5d141875352d92e72d/akshare_one-0.1.0-py3-none-any.whl", hash = "sha256:f66ff31a888fcd256d7157fc400ace7e15d51476d8c9fd2c9172df7d01616f88", size = 16585 },
+    { url = "https://files.pythonhosted.org/packages/ae/09/2155718e56fac154630361c7623325c9157f7a106ee468da2116ca253454/akshare_one-0.1.2-py3-none-any.whl", hash = "sha256:09789d7c11326c0b6cf191910229e99022a726e6cb7d40c35b02bae67f33102b", size = 15149 },
 ]
 
 [[package]]
@@ -133,7 +133,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "akshare-one", specifier = ">=0.1.0" },
+    { name = "akshare-one", specifier = ">=0.1.2" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.6.0" },
 ]
 
