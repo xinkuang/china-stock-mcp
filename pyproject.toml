@@ -1,10 +1,24 @@
 [project]
 name = "akshare-one-mcp"
 version = "0.1.0"
-description = "MCP server for akshare-one"
+description = "MCP server that provides access to Chinese stock market data using akshare-one"
 readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "zwldarren", email = "zwldarren@gmail.com" }]
 requires-python = ">=3.12"
 dependencies = [
     "akshare-one>=0.1.2",
     "mcp[cli]>=1.6.0",
 ]
+keywords = ["akshare", "stock", "mcp", "mcp-server"]
+
+[project.urls]
+Homepage = "https://github.com/zwldarren/akshare-one-mcp"
+Repository = "https://github.com/zwldarren/akshare-one-mcp.git"
+
+[project.scripts]
+akshare-one-mcp = "akshare_one_mcp.__main__:main"
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"

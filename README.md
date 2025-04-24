@@ -67,7 +67,7 @@ Input parameters:
 
 ## Usage Instructions
 
-### Running the server
+### Preparation
 
 1. Clone this repository:
 
@@ -76,7 +76,7 @@ Input parameters:
     cd akshare-one-mcp
     ```
 
-2. Install uv (<https://docs.astral.sh/uv/getting-started/installation/>)
+2. Install [uv](<https://docs.astral.sh/uv/getting-started/installation/>) if you haven't already.
 
 3. Install dependencies:
 
@@ -84,13 +84,7 @@ Input parameters:
     uv sync
     ```
 
-4. Run the server:
-
-    ```bash
-    uv run main.py
-    ```
-
-### Connect to Claude Desktop
+### Connect to Any MCP Client
 
 Add the following configuration to the MCP server configuration file:
 
@@ -102,7 +96,7 @@ Add the following configuration to the MCP server configuration file:
             "--directory",
             "/path/to/akshare-one-mcp",
             "run",
-            "server.py"
+            "akshare-one-mcp"
         ]
     }
 }

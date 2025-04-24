@@ -1,9 +1,8 @@
 import akshare_one as ak
-import logging
 from mcp.server.fastmcp import FastMCP
 from typing import Optional
 
-logger = logging.getLogger(__name__)
+
 mcp = FastMCP("akshare-one-mcp", dependencies=["akshare-one"])
 
 
@@ -110,9 +109,3 @@ def get_inner_trade_data(symbol: Optional[str] = None, source: str = "xueqiu") -
     """
     df = ak.get_inner_trade_data(symbol=symbol, source=source)
     return df.to_json(orient="records")
-
-
-if __name__ == "__main__":
-    logger.info("Starting AKShare One MCP Server...")
-    mcp.run(transport="stdio")
-    logger.info("AKShare One MCP Server stopped.")
