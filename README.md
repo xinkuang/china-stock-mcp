@@ -96,13 +96,13 @@ Add the following configuration to the MCP server configuration file:
 
 ```json
 "mcpServers": {
-    "akshare-mcp": {
+    "akshare-one-mcp": {
         "command": "uv",
         "args": [
             "--directory",
             "/path/to/akshare-one-mcp",
             "run",
-            "main.py"
+            "server.py"
         ]
     }
 }
