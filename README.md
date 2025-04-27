@@ -2,6 +2,10 @@
 
 An MCP server based on [akshare-one](https://github.com/zwldarren/akshare-one), providing interfaces for China stock market data. It offers a set of tools for retrieving financial information including historical stock data, real-time data, news data, financial statements, etc.
 
+<a href="https://glama.ai/mcp/servers/@zwldarren/akshare-one-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@zwldarren/akshare-one-mcp/badge" alt="akshare-one-mcp MCP server" />
+</a>
+
 ## Tools
 
 ### `get_hist_data`
