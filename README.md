@@ -1,5 +1,6 @@
 # AKShare One MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@zwldarren/akshare-one-mcp)](https://smithery.ai/server/@zwldarren/akshare-one-mcp)
 An MCP server based on [akshare-one](https://github.com/zwldarren/akshare-one), providing interfaces for China stock market data. It offers a set of tools for retrieving financial information including historical stock data, real-time data, news data, financial statements, etc.
 
 <a href="https://glama.ai/mcp/servers/@zwldarren/akshare-one-mcp">
@@ -70,6 +71,14 @@ Input parameters:
 - source (string, optional): Data source (default: 'xueqiu')
 
 ## Usage Instructions
+
+### Installing via Smithery
+
+To install akshare-one-mcp for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@zwldarren/akshare-one-mcp):
+
+```bash
+npx -y @smithery/cli install @zwldarren/akshare-one-mcp --client claude
+```
 
 ### Preparation
 
