@@ -1,6 +1,12 @@
 # AKShare One MCP Server
 
+<div align="center">
+  <a href="README.md">English</a> | 
+  <a href="README_zh.md">中文</a>
+</div>
+
 [![smithery badge](https://smithery.ai/badge/@zwldarren/akshare-one-mcp)](https://smithery.ai/server/@zwldarren/akshare-one-mcp)
+
 An MCP server based on [akshare-one](https://github.com/zwldarren/akshare-one), providing interfaces for China stock market data. It offers a set of tools for retrieving financial information including historical stock data, real-time data, news data, financial statements, etc.
 
 <a href="https://glama.ai/mcp/servers/@zwldarren/akshare-one-mcp">
@@ -80,7 +86,26 @@ To install akshare-one-mcp for Claude Desktop automatically via [Smithery](https
 npx -y @smithery/cli install @zwldarren/akshare-one-mcp --client claude
 ```
 
-### Preparation
+### Installing via `uv`
+
+Install directly from PyPI using uv:
+
+```bash
+uv pip install akshare-one-mcp
+```
+
+Add the following configuration:
+
+```json
+"mcpServers": {
+    "akshare-one-mcp": {
+        "command": "uvx",
+        "args": ["akshare-one-mcp"]
+    }
+}
+```
+
+### Installing via local source code
 
 1. Clone this repository:
 
@@ -97,20 +122,18 @@ npx -y @smithery/cli install @zwldarren/akshare-one-mcp --client claude
     uv sync
     ```
 
-### Connect to Any MCP Client
+4. Add the following configuration:
 
-Add the following configuration to the MCP server configuration file:
-
-```json
-"mcpServers": {
-    "akshare-one-mcp": {
-        "command": "uv",
-        "args": [
-            "--directory",
-            "/path/to/akshare-one-mcp",
-            "run",
-            "akshare-one-mcp"
-        ]
+    ```json
+    "mcpServers": {
+        "akshare-one-mcp": {
+            "command": "uv",
+            "args": [
+                "--directory",
+                "/path/to/akshare-one-mcp",
+                "run",
+                "akshare-one-mcp"
+            ]
+        }
     }
-}
-```
+    ```
