@@ -19,7 +19,7 @@ def get_hist_data(
     """Get historical stock market data
 
     Args:
-        symbol: Stock symbol/ticker
+        symbol: Stock symbol/ticker (e.g. '000001')
         interval: Time interval ('minute','hour','day','week','month','year')
         interval_multiplier: Interval multiplier (default: 1)
         start_date: Start date in YYYY-MM-DD format (default: '1970-01-01')
@@ -44,7 +44,7 @@ def get_realtime_data(symbol: Optional[str] = None, source: str = "eastmoney") -
     """Get real-time stock market data
 
     Args:
-        symbol: Stock symbol/ticker (optional)
+        symbol: Stock symbol/ticker (optional, e.g. '000001')
         source: Data source (default: 'eastmoney')
     """
     df = ak.get_realtime_data(symbol=symbol, source=source)
@@ -56,7 +56,7 @@ def get_news_data(symbol: str, source: str = "eastmoney") -> str:
     """Get stock-related news data
 
     Args:
-        symbol: Stock symbol/ticker
+        symbol: Stock symbol/ticker (e.g. '000001')
         source: Data source (default: 'eastmoney')
     """
     df = ak.get_news_data(symbol=symbol, source=source)
@@ -68,7 +68,7 @@ def get_balance_sheet(symbol: str, source: str = "sina") -> str:
     """Get company balance sheet data
 
     Args:
-        symbol: Stock symbol/ticker
+        symbol: Stock symbol/ticker (e.g. '000001')
         source: Data source (default: 'sina')
     """
     df = ak.get_balance_sheet(symbol=symbol, source=source)
@@ -80,7 +80,7 @@ def get_income_statement(symbol: str, source: str = "sina") -> str:
     """Get company income statement data
 
     Args:
-        symbol: Stock symbol/ticker
+        symbol: Stock symbol/ticker (e.g. '000001')
         source: Data source (default: 'sina')
     """
     df = ak.get_income_statement(symbol=symbol, source=source)
@@ -92,7 +92,7 @@ def get_cash_flow(symbol: str, source: str = "sina") -> str:
     """Get company cash flow statement data
 
     Args:
-        symbol: Stock symbol/ticker
+        symbol: Stock symbol/ticker (e.g. '000001')
         source: Data source (default: 'sina')
     """
     df = ak.get_cash_flow(symbol=symbol, source=source)
@@ -104,7 +104,7 @@ def get_inner_trade_data(symbol: Optional[str] = None, source: str = "xueqiu") -
     """Get company insider trading data
 
     Args:
-        symbol: Stock symbol/ticker (optional)
+        symbol: Stock symbol/ticker (optional, e.g. '000001')
         source: Data source (default: 'xueqiu')
     """
     df = ak.get_inner_trade_data(symbol=symbol, source=source)
