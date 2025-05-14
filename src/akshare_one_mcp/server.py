@@ -40,12 +40,12 @@ def get_hist_data(
 
 
 @mcp.tool()
-def get_realtime_data(symbol: Optional[str] = None, source: str = "eastmoney") -> str:
+def get_realtime_data(symbol: Optional[str] = None, source: str = "xueqiu") -> str:
     """Get real-time stock market data
 
     Args:
         symbol: Stock symbol/ticker (optional, e.g. '000001')
-        source: Data source (default: 'eastmoney')
+        source: Data source ('xueqiu', 'eastmoney') (default: 'xueqiu')
     """
     df = ak.get_realtime_data(symbol=symbol, source=source)
     return df.to_json(orient="records")
