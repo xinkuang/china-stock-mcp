@@ -5,10 +5,11 @@ from akshare_one_mcp.server import mcp
 
 logger = logging.getLogger(__name__)
 
+
 def main():
-    logger.info("Starting AKShare One MCP Server...")
-    mcp.run(transport="stdio")
-    logger.info("AKShare One MCP Server stopped.")
+    # mcp.run(transport="streamable-http", port=8902)
+    mcp.run()
+
 
 if __name__ == "__main__":
     main()

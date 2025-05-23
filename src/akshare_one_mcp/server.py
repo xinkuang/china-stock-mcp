@@ -1,9 +1,9 @@
 import akshare_one as ak
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 from typing import Optional
 
 
-mcp = FastMCP("akshare-one-mcp", dependencies=["akshare-one"])
+mcp = FastMCP(name="akshare-one-mcp")
 
 
 @mcp.tool()
