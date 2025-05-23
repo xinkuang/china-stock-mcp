@@ -34,7 +34,7 @@ Get real-time stock data
 Input parameters:
 
 - symbol (string, optional): Stock code
-- source (string, optional): Data source (default: 'eastmoney')
+- source (string, optional): Data source (default: 'xueqiu')
 
 ### `get_news_data`
 
@@ -42,7 +42,7 @@ Get stock-related news data
 Input parameters:
 
 - symbol (string): Stock code
-- source (string, optional): Data source (default: 'eastmoney')
+- recent_n (number, optional): Number of most recent records to return (optional)
 
 ### `get_balance_sheet`
 
@@ -50,7 +50,7 @@ Get company balance sheet data
 Input parameters:
 
 - symbol (string): Stock code
-- source (string, optional): Data source (default: 'sina')
+- recent_n (number, optional): Number of most recent records to return (optional)
 
 ### `get_income_statement`
 
@@ -58,7 +58,7 @@ Get company income statement data
 Input parameters:
 
 - symbol (string): Stock code
-- source (string, optional): Data source (default: 'sina')
+- recent_n (number, optional): Number of most recent records to return (optional)
 
 ### `get_cash_flow`
 
@@ -74,7 +74,6 @@ Get company insider trading data
 Input parameters:
 
 - symbol (string, optional): Stock code
-- source (string, optional): Data source (default: 'xueqiu')
 
 ## Usage Instructions
 

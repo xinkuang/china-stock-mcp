@@ -34,7 +34,7 @@
 输入参数：
 
 - symbol (字符串, 可选): 股票代码
-- source (字符串, 可选): 数据源 (默认: 'eastmoney')
+- source (字符串, 可选): 数据源 (默认: 'xueqiu')
 
 ### `get_news_data`
 
@@ -42,7 +42,7 @@
 输入参数：
 
 - symbol (字符串): 股票代码
-- source (字符串, 可选): 数据源 (默认: 'eastmoney')
+- recent_n (数字, 可选): 返回最近记录的数量 (可选)
 
 ### `get_balance_sheet`
 
@@ -50,7 +50,7 @@
 输入参数：
 
 - symbol (字符串): 股票代码
-- source (字符串, 可选): 数据源 (默认: 'sina')
+- recent_n (数字, 可选): 返回最近记录的数量 (可选)
 
 ### `get_income_statement`
 
@@ -58,7 +58,7 @@
 输入参数：
 
 - symbol (字符串): 股票代码
-- source (字符串, 可选): 数据源 (默认: 'sina')
+- recent_n (数字, 可选): 返回最近记录的数量 (可选)
 
 ### `get_cash_flow`
 
@@ -74,7 +74,6 @@
 输入参数：
 
 - symbol (字符串, 可选): 股票代码
-- source (字符串, 可选): 数据源 (默认: 'xueqiu')
 
 ## 使用说明
 
