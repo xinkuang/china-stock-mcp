@@ -1,3 +1,4 @@
+from datetime import datetime
 import akshare_one as ak
 from fastmcp import FastMCP
 from typing import Optional
@@ -119,3 +120,16 @@ def get_inner_trade_data(symbol: Optional[str] = None) -> str:
     """
     df = ak.get_inner_trade_data(symbol=symbol, source="xueqiu")
     return df.to_json(orient="records")
+
+
+@mcp.tool()
+def get_current_time() -> dict:
+    """Get current time with ISO format and timestamp
+
+    Returns:
+        JSON string containing:
+        - iso_format: ISO formatted local time string
+        - timestamp: Unix timestamp
+    """
+    local_time = datetime.now().astimezone()
+    return {"iso_format": local_time.isoformat(), "timestamp": local_time.timestamp()}

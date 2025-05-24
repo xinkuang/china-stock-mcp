@@ -75,6 +75,10 @@
 
 - symbol (字符串, 可选): 股票代码
 
+### `get_current_time`
+
+获取当前时间(ISO格式和时间戳)
+
 ## 使用说明
 
 ### 通过 Smithery 安装

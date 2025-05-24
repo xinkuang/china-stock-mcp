@@ -75,6 +75,10 @@ Input parameters:
 
 - symbol (string, optional): Stock code
 
+### `get_current_time`
+
+Get current time with ISO format and timestamp
+
 ## Usage Instructions
 
 ### Installing via Smithery
