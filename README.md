@@ -77,7 +77,7 @@ Input parameters:
 
 ### `get_current_time`
 
-Get current time with ISO format and timestamp
+Get current time with ISO format, timestamp, and the last trading day
 
 ## Usage Instructions
 
