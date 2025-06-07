@@ -20,6 +20,9 @@ def get_hist_data(
 ) -> str:
     """Get historical stock market data
 
+    'eastmoney_direct' support HK stock (e.g. '00700'). But minute and hour
+    data are only available for the current trading day.
+
     Args:
         symbol: Stock symbol/ticker (e.g. '000001')
         interval: Time interval ('minute','hour','day','week','month','year')
@@ -27,7 +30,7 @@ def get_hist_data(
         start_date: Start date in YYYY-MM-DD format (default: '1970-01-01')
         end_date: End date in YYYY-MM-DD format (default: '2030-12-31')
         adjust: Adjustment type ('none', 'qfq', 'hfq') (default: 'none')
-        source: Data source ('eastmoney', 'sina') (default: 'eastmoney')
+        source: Data source ('eastmoney', 'eastmoney_direct', 'sina') (default: 'eastmoney')
     """
     df = ako.get_hist_data(
         symbol=symbol,
@@ -45,9 +48,11 @@ def get_hist_data(
 def get_realtime_data(symbol: Optional[str] = None, source: str = "xueqiu") -> str:
     """Get real-time stock market data
 
+    'eastmoney_direct' support HK stock (e.g. '00700')
+
     Args:
         symbol: Stock symbol/ticker (optional, e.g. '000001')
-        source: Data source ('xueqiu', 'eastmoney') (default: 'xueqiu')
+        source: Data source ('xueqiu', 'eastmoney', 'eastmoney_direct') (default: 'xueqiu')
     """
     df = ako.get_realtime_data(symbol=symbol, source=source)
     return df.to_json(orient="records")

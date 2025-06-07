@@ -26,7 +26,7 @@
 - start_date (字符串, 可选): 开始日期 YYYY-MM-DD 格式 (默认: '1970-01-01')
 - end_date (字符串, 可选): 结束日期 YYYY-MM-DD 格式 (默认: '2030-12-31')
 - adjust (字符串, 可选): 调整类型 ('none', 'qfq', 'hfq') (默认: 'none')
-- source (字符串, 可选): 数据源 ('eastmoney', 'sina') (默认: 'eastmoney')
+- source (字符串, 可选): 数据源 ('eastmoney', 'eastmoney_direct' 'sina') (默认: 'eastmoney')
 
 ### `get_realtime_data`
 
