@@ -124,7 +124,7 @@ wheels = [
 
 [[package]]
 name = "akshare-one-mcp"
-version = "0.1.3"
+version = "0.1.4"
 source = { editable = "." }
 dependencies = [
     { name = "akshare" },
@@ -136,7 +136,7 @@ dependencies = [
 requires-dist = [
     { name = "akshare", specifier = ">=1.16.98" },
     { name = "akshare-one", specifier = ">=0.2.2" },
-    { name = "fastmcp", specifier = ">=2.7.0" },
+    { name = "fastmcp", specifier = ">=2.6.1" },
 ]
 
 [[package]]
