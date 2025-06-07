@@ -34,7 +34,7 @@
 输入参数：
 
 - symbol (字符串, 可选): 股票代码
-- source (字符串, 可选): 数据源 (默认: 'xueqiu')
+- source (字符串, 可选): 数据源 ('xueqiu', 'eastmoney_direct') (默认: 'xueqiu')
 
 ### `get_news_data`
 

@@ -26,7 +26,7 @@ Input parameters:
 - start_date (string, optional): Start date in YYYY-MM-DD format (default: '1970-01-01')
 - end_date (string, optional): End date in YYYY-MM-DD format (default: '2030-12-31')
 - adjust (string, optional): Adjustment type ('none', 'qfq', 'hfq') (default: 'none')
-- source (string, optional): Data source ('eastmoney', 'sina') (default: 'eastmoney')
+- source (string, optional): Data source ('eastmoney', 'eastmoney_direct', 'sina') (default: 'eastmoney')
 
 ### `get_realtime_data`
 
@@ -34,7 +34,7 @@ Get real-time stock data
 Input parameters:
 
 - symbol (string, optional): Stock code
-- source (string, optional): Data source (default: 'xueqiu')
+- source (string, optional): Data source ('xueqiu', 'eastmoney_direct') (default: 'xueqiu')
 
 ### `get_news_data`
 
