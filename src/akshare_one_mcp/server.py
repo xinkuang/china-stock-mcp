@@ -51,6 +51,9 @@ def get_hist_data(
         | None,
         Field(description="Technical indicators to add"),
     ] = None,
+    recent_n: Annotated[
+        int | None, Field(description="Number of most recent records to return", ge=1)
+    ] = 100,
 ) -> str:
     """Get historical stock market data. Use 'eastmoney_direct' to get HK stock data (e.g. '00700')."""
     df = ako.get_hist_data(
@@ -85,6 +88,8 @@ def get_hist_data(
                 temp.append(indicator_df)
         if temp:
             df = df.join(temp)
+    if recent_n is not None:
+        df = df.tail(recent_n)
     return df.to_json(orient="records")
 
 
@@ -113,7 +118,7 @@ def get_news_data(
     """Get stock-related news data."""
     df = ako.get_news_data(symbol=symbol, source="eastmoney")
     if recent_n is not None:
-        df = df.head(recent_n)
+        df = df.tail(recent_n)
     return df.to_json(orient="records")
 
 

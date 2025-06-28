@@ -17,21 +17,21 @@ An MCP server based on [akshare-one](https://github.com/zwldarren/akshare-one), 
 
 ### `get_hist_data`
 
-Get historical stock data
-Input parameters:
+Get historical stock market data.
 
-- symbol (string): Stock code
-- interval (string): Time interval ('minute','hour','day','week','month','year')
+- symbol (string): Stock code (e.g. '000001')
+- interval (string): Time interval ('minute','hour','day','week','month','year') (default: 'day')
 - interval_multiplier (number, optional): Interval multiplier (default: 1)
 - start_date (string, optional): Start date in YYYY-MM-DD format (default: '1970-01-01')
 - end_date (string, optional): End date in YYYY-MM-DD format (default: '2030-12-31')
 - adjust (string, optional): Adjustment type ('none', 'qfq', 'hfq') (default: 'none')
 - source (string, optional): Data source ('eastmoney', 'eastmoney_direct', 'sina') (default: 'eastmoney')
+- indicators_list (list, optional): Technical indicators to add (e.g. ['SMA', 'EMA', 'RSI', 'MACD', 'BOLL', 'STOCH', 'ATR', 'CCI', 'ADX'])
+- recent_n (number, optional): Number of most recent records to return (default: 100)
 
 ### `get_realtime_data`
 
 Get real-time stock data
-Input parameters:
 
 - symbol (string, optional): Stock code
 - source (string, optional): Data source ('xueqiu', 'eastmoney_direct') (default: 'xueqiu')
@@ -39,7 +39,6 @@ Input parameters:
 ### `get_news_data`
 
 Get stock-related news data
-Input parameters:
 
 - symbol (string): Stock code
 - recent_n (number, optional): Number of most recent records to return (optional)
@@ -47,7 +46,6 @@ Input parameters:
 ### `get_balance_sheet`
 
 Get company balance sheet data
-Input parameters:
 
 - symbol (string): Stock code
 - recent_n (number, optional): Number of most recent records to return (optional)
@@ -55,7 +53,6 @@ Input parameters:
 ### `get_income_statement`
 
 Get company income statement data
-Input parameters:
 
 - symbol (string): Stock code
 - recent_n (number, optional): Number of most recent records to return (optional)
@@ -63,7 +60,6 @@ Input parameters:
 ### `get_cash_flow`
 
 Get company cash flow statement data
-Input parameters:
 
 - symbol (string): Stock code
 - source (string, optional): Data source (default: 'sina')
@@ -71,13 +67,12 @@ Input parameters:
 ### `get_inner_trade_data`
 
 Get company insider trading data
-Input parameters:
 
 - symbol (string, optional): Stock code
 
-### `get_current_time`
+### `get_time_info`
 
-Get current time with ISO format, timestamp, and the last trading day
+Get current time with ISO format, timestamp, and the last trading day.
 
 ## Usage Instructions
 
