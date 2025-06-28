@@ -17,21 +17,21 @@
 
 ### `get_hist_data`
 
-获取历史股票数据
-输入参数：
+获取历史股票市场数据。
 
-- symbol (字符串): 股票代码
-- interval (字符串): 时间间隔 ('minute','hour','day','week','month','year')
+- symbol (字符串): 股票代码 (例如 '000001')
+- interval (字符串): 时间间隔 ('minute','hour','day','week','month','year') (默认: 'day')
 - interval_multiplier (数字, 可选): 间隔倍数 (默认: 1)
 - start_date (字符串, 可选): 开始日期 YYYY-MM-DD 格式 (默认: '1970-01-01')
 - end_date (字符串, 可选): 结束日期 YYYY-MM-DD 格式 (默认: '2030-12-31')
 - adjust (字符串, 可选): 调整类型 ('none', 'qfq', 'hfq') (默认: 'none')
-- source (字符串, 可选): 数据源 ('eastmoney', 'eastmoney_direct' 'sina') (默认: 'eastmoney')
+- source (字符串, 可选): 数据源 ('eastmoney', 'eastmoney_direct', 'sina') (默认: 'eastmoney')
+- indicators_list (列表, 可选): 技术指标 (例如 ['SMA', 'EMA', 'RSI', 'MACD', 'BOLL', 'STOCH', 'ATR', 'CCI', 'ADX'])
+- recent_n (数字, 可选): 返回最近记录的数量 (默认: 100)
 
 ### `get_realtime_data`
 
 获取实时股票数据
-输入参数：
 
 - symbol (字符串, 可选): 股票代码
 - source (字符串, 可选): 数据源 ('xueqiu', 'eastmoney_direct') (默认: 'xueqiu')
@@ -39,7 +39,6 @@
 ### `get_news_data`
 
 获取股票相关新闻数据
-输入参数：
 
 - symbol (字符串): 股票代码
 - recent_n (数字, 可选): 返回最近记录的数量 (可选)
@@ -47,7 +46,6 @@
 ### `get_balance_sheet`
 
 获取公司资产负债表数据
-输入参数：
 
 - symbol (字符串): 股票代码
 - recent_n (数字, 可选): 返回最近记录的数量 (可选)
@@ -55,7 +53,6 @@
 ### `get_income_statement`
 
 获取公司利润表数据
-输入参数：
 
 - symbol (字符串): 股票代码
 - recent_n (数字, 可选): 返回最近记录的数量 (可选)
@@ -63,7 +60,6 @@
 ### `get_cash_flow`
 
 获取公司现金流量表数据
-输入参数：
 
 - symbol (字符串): 股票代码
 - source (字符串, 可选): 数据源 (默认: 'sina')
@@ -71,13 +67,12 @@
 ### `get_inner_trade_data`
 
 获取公司内部交易数据
-输入参数：
 
 - symbol (字符串, 可选): 股票代码
 
 ### `get_time_info`
 
-获取当前时间和最近一个交易日
+获取当前时间(ISO格式)、时间戳和最近一个交易日。
 
 ## 使用说明
 
@@ -139,3 +134,4 @@ uv pip install akshare-one-mcp
             ]
         }
     }
+    ```

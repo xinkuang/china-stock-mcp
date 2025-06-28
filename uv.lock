@@ -83,7 +83,7 @@ wheels = [
 
 [[package]]
 name = "akshare"
-version = "1.17.5"
+version = "1.17.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -104,39 +104,37 @@ dependencies = [
     { name = "urllib3" },
     { name = "xlrd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b0/54/f97e3bb9f585a01ba56b3b8fc9988f647822b1e2ce821ae7acf132100053/akshare-1.17.5.tar.gz", hash = "sha256:38624ef144b0bca7365ffd3538c2afb2934d1b90a0c38fa5b511871156d7fff9", size = 838887, upload-time = "2025-06-17T08:19:25.796Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3f/95/0e720789de6c3c64a6e319ac5f7a1f581c86fa5711c30df8292b1f2102d1/akshare-1.17.8.tar.gz", hash = "sha256:7422d77927ebe8a08848edcae3ccf9760494d294cbfcb738b0257dcc9d98a1fc", size = 838897, upload-time = "2025-06-23T07:20:22.007Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8b/1d/33cebc2b7a34b73e457125e358b99bfa178c796c72f7962f9d2af15abadd/akshare-1.17.5-py3-none-any.whl", hash = "sha256:f3c3e3261ae3074c54363bc0d50a315c78622352938af4dc535353a682215738", size = 1053060, upload-time = "2025-06-17T08:19:24.242Z" },
+    { url = "https://files.pythonhosted.org/packages/10/95/ac436bce3880823905e0d1c0bede7e10d15c4927960f54b5e0fbc555ea4a/akshare-1.17.8-py3-none-any.whl", hash = "sha256:deb8fbd83053ba238bfa1ecbd6c169dba7dbf027d854cd0275f1a7a558598e2a", size = 1053086, upload-time = "2025-06-23T07:20:20.539Z" },
 ]
 
 [[package]]
 name = "akshare-one"
-version = "0.2.3"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "akshare" },
     { name = "cachetools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/11/93/77e7a849f4ce5f10aa4c66c7413043d3de7c99b2b4f9a15da762670abb3f/akshare_one-0.2.3.tar.gz", hash = "sha256:7bb6f8a51dac3601d8e2562752a0dbba0d8a3563e76c06cd34c4099375867319", size = 19822, upload-time = "2025-06-17T08:47:16.81Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/9a/050709942097c69549c24cbc25cb59dd159e2af90e41f28bfdf3e24e886a/akshare_one-0.3.0.tar.gz", hash = "sha256:468aec830e0776616df86685d040e8eef9eac6dfdb5ef987cc1692f2beec0104", size = 27330, upload-time = "2025-06-28T04:02:15.738Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b5/c3/dfa13c50ac5a25a7355bf8400d6ab564a28daeea6b9dde32d7a0487977ad/akshare_one-0.2.3-py3-none-any.whl", hash = "sha256:bdbc274b4a6cf024ef8cd1b6906a85336953351d5fbdb87f86c1ac317fcf632f", size = 28731, upload-time = "2025-06-17T08:47:15.995Z" },
+    { url = "https://files.pythonhosted.org/packages/65/06/29b168c06034c9cf27e582f5b155d2c510c328a12c68d9887de5389c4d7b/akshare_one-0.3.0-py3-none-any.whl", hash = "sha256:029a6d62fbaea7f5a9a93408089205ac30bbbd623ad72448e7788cd0a44025c6", size = 35753, upload-time = "2025-06-28T04:02:14.198Z" },
 ]
 
 [[package]]
 name = "akshare-one-mcp"
-version = "0.1.4"
+version = "0.1.5"
 source = { editable = "." }
 dependencies = [
-    { name = "akshare" },
     { name = "akshare-one" },
     { name = "fastmcp" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "akshare", specifier = ">=1.17.5" },
-    { name = "akshare-one", specifier = ">=0.2.3" },
-    { name = "fastmcp", specifier = ">=2.8.1" },
+    { name = "akshare-one", specifier = ">=0.3.0" },
+    { name = "fastmcp", specifier = ">=2.9.2" },
 ]
 
 [[package]]
@@ -370,7 +368,7 @@ wheels = [
 
 [[package]]
 name = "fastmcp"
-version = "2.8.1"
+version = "2.9.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "authlib" },
@@ -382,9 +380,9 @@ dependencies = [
     { name = "rich" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/04/76/d9b352dd632dbac9eea3255df7bba6d83b2def769b388ec332368d7b4638/fastmcp-2.8.1.tar.gz", hash = "sha256:c89d8ce8bf53a166eda444cfdcb2c638170e62445487229fbaf340aed31beeaf", size = 2559427, upload-time = "2025-06-15T01:24:37.535Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/68/17/d2b5981180717e6e689d0aaa6215d1ddcec6cb065c6f6b45c471ab7d2edb/fastmcp-2.9.2.tar.gz", hash = "sha256:c000eb0a2d50afcc7d26be4c867abf5c995ca0e0119f17417d50f61e2e17347c", size = 2663824, upload-time = "2025-06-26T15:03:15.395Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0a/f9/ecb902857d634e81287f205954ef1c69637f27b487b109bf3b4b62d3dbe7/fastmcp-2.8.1-py3-none-any.whl", hash = "sha256:3b56a7bbab6bbac64d2a251a98b3dec5bb822ab1e4e9f20bb259add028b10d44", size = 138191, upload-time = "2025-06-15T01:24:35.964Z" },
+    { url = "https://files.pythonhosted.org/packages/89/60/223e1975e65ed7c6cead0fda947d4cdb4f7ee5ec60a7c8ea3b3787868f67/fastmcp-2.9.2-py3-none-any.whl", hash = "sha256:3626a3d9b1fa6325756273b6d1fe1ec610baafec957ac22f7aa1dc17c1db8b93", size = 162690, upload-time = "2025-06-26T15:03:13.553Z" },
 ]
 
 [[package]]

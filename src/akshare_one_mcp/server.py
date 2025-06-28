@@ -1,37 +1,61 @@
 from datetime import datetime
+from typing import Annotated, Literal
+
 import akshare as ak
 import akshare_one as ako
+from akshare_one import indicators
 from fastmcp import FastMCP
-from typing import Optional
+from pydantic import Field
 
 
 mcp = FastMCP(name="akshare-one-mcp")
 
 
-@mcp.tool()
+@mcp.tool
 def get_hist_data(
-    symbol: str,
-    interval: str,
-    interval_multiplier: int = 1,
-    start_date: str = "1970-01-01",
-    end_date: str = "2030-12-31",
-    adjust: str = "none",
-    source: str = "eastmoney",
+    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    interval: Annotated[
+        Literal["minute", "hour", "day", "week", "month", "year"],
+        Field(description="Time interval"),
+    ] = "day",
+    interval_multiplier: Annotated[
+        int, Field(description="Interval multiplier", ge=1)
+    ] = 1,
+    start_date: Annotated[
+        str, Field(description="Start date in YYYY-MM-DD format")
+    ] = "1970-01-01",
+    end_date: Annotated[
+        str, Field(description="End date in YYYY-MM-DD format")
+    ] = "2030-12-31",
+    adjust: Annotated[
+        Literal["none", "qfq", "hfq"], Field(description="Adjustment type")
+    ] = "none",
+    source: Annotated[
+        Literal["eastmoney", "eastmoney_direct", "sina"],
+        Field(description="Data source"),
+    ] = "eastmoney",
+    indicators_list: Annotated[
+        list[
+            Literal[
+                "SMA",
+                "EMA",
+                "RSI",
+                "MACD",
+                "BOLL",
+                "STOCH",
+                "ATR",
+                "CCI",
+                "ADX",
+            ]
+        ]
+        | None,
+        Field(description="Technical indicators to add"),
+    ] = None,
+    recent_n: Annotated[
+        int | None, Field(description="Number of most recent records to return", ge=1)
+    ] = 100,
 ) -> str:
-    """Get historical stock market data
-
-    'eastmoney_direct' support HK stock (e.g. '00700'). But minute and hour
-    data are only available for the current trading day.
-
-    Args:
-        symbol: Stock symbol/ticker (e.g. '000001')
-        interval: Time interval ('minute','hour','day','week','month','year')
-        interval_multiplier: Interval multiplier (default: 1)
-        start_date: Start date in YYYY-MM-DD format (default: '1970-01-01')
-        end_date: End date in YYYY-MM-DD format (default: '2030-12-31')
-        adjust: Adjustment type ('none', 'qfq', 'hfq') (default: 'none')
-        source: Data source ('eastmoney', 'eastmoney_direct', 'sina') (default: 'eastmoney')
-    """
+    """Get historical stock market data. Use 'eastmoney_direct' to get HK stock data (e.g. '00700')."""
     df = ako.get_hist_data(
         symbol=symbol,
         interval=interval,
@@ -41,103 +65,118 @@ def get_hist_data(
         adjust=adjust,
         source=source,
     )
+    if indicators_list:
+        indicator_map = {
+            "SMA": (indicators.get_sma, {"window": 20}),
+            "EMA": (indicators.get_ema, {"window": 20}),
+            "RSI": (indicators.get_rsi, {"window": 14}),
+            "MACD": (indicators.get_macd, {"fast": 12, "slow": 26, "signal": 9}),
+            "BOLL": (indicators.get_bollinger_bands, {"window": 20, "std": 2}),
+            "STOCH": (
+                indicators.get_stoch,
+                {"window": 14, "smooth_d": 3, "smooth_k": 3},
+            ),
+            "ATR": (indicators.get_atr, {"window": 14}),
+            "CCI": (indicators.get_cci, {"window": 14}),
+            "ADX": (indicators.get_adx, {"window": 14}),
+        }
+        temp = []
+        for indicator in indicators_list:
+            if indicator in indicator_map:
+                func, params = indicator_map[indicator]
+                indicator_df = func(df, **params)
+                temp.append(indicator_df)
+        if temp:
+            df = df.join(temp)
+    if recent_n is not None:
+        df = df.tail(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool()
-def get_realtime_data(symbol: Optional[str] = None, source: str = "xueqiu") -> str:
-    """Get real-time stock market data
-
-    'eastmoney_direct' support HK stock (e.g. '00700')
-
-    Args:
-        symbol: Stock symbol/ticker (optional, e.g. '000001')
-        source: Data source ('xueqiu', 'eastmoney', 'eastmoney_direct') (default: 'xueqiu')
-    """
+@mcp.tool
+def get_realtime_data(
+    symbol: Annotated[
+        str | None, Field(description="Stock symbol/ticker (e.g. '000001')")
+    ] = None,
+    source: Annotated[
+        Literal["xueqiu", "eastmoney", "eastmoney_direct"],
+        Field(description="Data source"),
+    ] = "xueqiu",
+) -> str:
+    """Get real-time stock market data. Use 'eastmoney_direct' to get HK stock data (e.g. '00700')."""
     df = ako.get_realtime_data(symbol=symbol, source=source)
     return df.to_json(orient="records")
 
 
-@mcp.tool()
-def get_news_data(symbol: str, recent_n: Optional[int] = 10) -> str:
-    """Get stock-related news data
-
-    Args:
-        symbol: Stock symbol/ticker (e.g. '000001')
-        recent_n: Number of most recent records to return (optional)
-    """
+@mcp.tool
+def get_news_data(
+    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    recent_n: Annotated[
+        int | None, Field(description="Number of most recent records to return", ge=1)
+    ] = 10,
+) -> str:
+    """Get stock-related news data."""
     df = ako.get_news_data(symbol=symbol, source="eastmoney")
     if recent_n is not None:
-        df = df.head(recent_n)
+        df = df.tail(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool()
-def get_balance_sheet(symbol: str, recent_n: Optional[int] = 10) -> str:
-    """Get company balance sheet data
-
-    Args:
-        symbol: Stock symbol/ticker (e.g. '000001')
-        recent_n: Number of most recent records to return (optional)
-    """
+@mcp.tool
+def get_balance_sheet(
+    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    recent_n: Annotated[
+        int | None, Field(description="Number of most recent records to return", ge=1)
+    ] = 10,
+) -> str:
+    """Get company balance sheet data."""
     df = ako.get_balance_sheet(symbol=symbol, source="sina")
     if recent_n is not None:
         df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool()
-def get_income_statement(symbol: str, recent_n: Optional[int] = 10) -> str:
-    """Get company income statement data
-
-    Args:
-        symbol: Stock symbol/ticker (e.g. '000001')
-        recent_n: Number of most recent records to return (optional)
-    """
+@mcp.tool
+def get_income_statement(
+    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    recent_n: Annotated[
+        int | None, Field(description="Number of most recent records to return", ge=1)
+    ] = 10,
+) -> str:
+    """Get company income statement data."""
     df = ako.get_income_statement(symbol=symbol, source="sina")
     if recent_n is not None:
         df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_cash_flow(
-    symbol: str, source: str = "sina", recent_n: Optional[int] = 10
+    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    source: Annotated[str, Field(description="Data source")] = "sina",
+    recent_n: Annotated[
+        int | None, Field(description="Number of most recent records to return", ge=1)
+    ] = 10,
 ) -> str:
-    """Get company cash flow statement data
-
-    Args:
-        symbol: Stock symbol/ticker (e.g. '000001')
-        source: Data source (default: 'sina')
-        recent_n: Number of most recent records to return (optional)
-    """
+    """Get company cash flow statement data."""
     df = ako.get_cash_flow(symbol=symbol, source=source)
     if recent_n is not None:
         df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool()
-def get_inner_trade_data(symbol: str) -> str:
-    """Get company insider trading data
-
-    Args:
-        symbol: Stock symbol/ticker (e.g. '000001')
-    """
+@mcp.tool
+def get_inner_trade_data(
+    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+) -> str:
+    """Get company insider trading data."""
     df = ako.get_inner_trade_data(symbol, source="xueqiu")
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_time_info() -> dict:
-    """Get current time with ISO format, timestamp, and the last trading day
-
-    Returns:
-        A dictionary containing:
-        - iso_format: ISO formatted local time string
-        - timestamp: Unix timestamp
-        - last_trading_day: The most recent trading day in YYYY-MM-DD format
-    """
+    """Get current time with ISO format, timestamp, and the last trading day."""
     local_time = datetime.now().astimezone()
     current_date = local_time.date()
 
