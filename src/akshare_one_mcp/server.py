@@ -3,6 +3,7 @@ from typing import Annotated, Literal
 
 import akshare as ak
 import akshare_one as ako
+from akshare_one import indicators
 from fastmcp import FastMCP
 from pydantic import Field
 
@@ -10,13 +11,13 @@ from pydantic import Field
 mcp = FastMCP(name="akshare-one-mcp")
 
 
-@mcp.tool()
+@mcp.tool
 def get_hist_data(
     symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
     interval: Annotated[
         Literal["minute", "hour", "day", "week", "month", "year"],
         Field(description="Time interval"),
-    ],
+    ] = "day",
     interval_multiplier: Annotated[
         int, Field(description="Interval multiplier", ge=1)
     ] = 1,
@@ -33,6 +34,23 @@ def get_hist_data(
         Literal["eastmoney", "eastmoney_direct", "sina"],
         Field(description="Data source"),
     ] = "eastmoney",
+    indicators_list: Annotated[
+        list[
+            Literal[
+                "SMA",
+                "EMA",
+                "RSI",
+                "MACD",
+                "BOLL",
+                "STOCH",
+                "ATR",
+                "CCI",
+                "ADX",
+            ]
+        ]
+        | None,
+        Field(description="Technical indicators to add"),
+    ] = None,
 ) -> str:
     """Get historical stock market data. Use 'eastmoney_direct' to get HK stock data (e.g. '00700')."""
     df = ako.get_hist_data(
@@ -44,10 +62,33 @@ def get_hist_data(
         adjust=adjust,
         source=source,
     )
+    if indicators_list:
+        indicator_map = {
+            "SMA": (indicators.get_sma, {"window": 20}),
+            "EMA": (indicators.get_ema, {"window": 20}),
+            "RSI": (indicators.get_rsi, {"window": 14}),
+            "MACD": (indicators.get_macd, {"fast": 12, "slow": 26, "signal": 9}),
+            "BOLL": (indicators.get_bollinger_bands, {"window": 20, "std": 2}),
+            "STOCH": (
+                indicators.get_stoch,
+                {"window": 14, "smooth_d": 3, "smooth_k": 3},
+            ),
+            "ATR": (indicators.get_atr, {"window": 14}),
+            "CCI": (indicators.get_cci, {"window": 14}),
+            "ADX": (indicators.get_adx, {"window": 14}),
+        }
+        temp = []
+        for indicator in indicators_list:
+            if indicator in indicator_map:
+                func, params = indicator_map[indicator]
+                indicator_df = func(df, **params)
+                temp.append(indicator_df)
+        if temp:
+            df = df.join(temp)
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_realtime_data(
     symbol: Annotated[
         str | None, Field(description="Stock symbol/ticker (e.g. '000001')")
@@ -62,7 +103,7 @@ def get_realtime_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_news_data(
     symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
     recent_n: Annotated[
@@ -76,7 +117,7 @@ def get_news_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_balance_sheet(
     symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
     recent_n: Annotated[
@@ -90,7 +131,7 @@ def get_balance_sheet(
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_income_statement(
     symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
     recent_n: Annotated[
@@ -104,7 +145,7 @@ def get_income_statement(
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_cash_flow(
     symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
     source: Annotated[str, Field(description="Data source")] = "sina",
@@ -119,7 +160,7 @@ def get_cash_flow(
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_inner_trade_data(
     symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
 ) -> str:
@@ -128,7 +169,7 @@ def get_inner_trade_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool()
+@mcp.tool
 def get_time_info() -> dict:
     """Get current time with ISO format, timestamp, and the last trading day."""
     local_time = datetime.now().astimezone()
