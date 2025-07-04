@@ -55,7 +55,7 @@ def get_hist_data(
         int | None, Field(description="Number of most recent records to return", ge=1)
     ] = 100,
 ) -> str:
-    """Get historical stock market data. Use 'eastmoney_direct' to get HK stock data (e.g. '00700')."""
+    """Get historical stock market data. 'eastmoney_direct' support all A,B,H shares"""
     df = ako.get_hist_data(
         symbol=symbol,
         interval=interval,
@@ -103,7 +103,7 @@ def get_realtime_data(
         Field(description="Data source"),
     ] = "xueqiu",
 ) -> str:
-    """Get real-time stock market data. Use 'eastmoney_direct' to get HK stock data (e.g. '00700')."""
+    """Get real-time stock market data. 'eastmoney_direct' support all A,B,H shares"""
     df = ako.get_realtime_data(symbol=symbol, source=source)
     return df.to_json(orient="records")
 
