@@ -17,58 +17,66 @@
 
 ### `get_hist_data`
 
-获取历史股票市场数据。
+获取历史股票市场数据。'eastmoney_direct' 支持所有 A、B、H 股
 
 - symbol (字符串): 股票代码 (例如 '000001')
 - interval (字符串): 时间间隔 ('minute','hour','day','week','month','year') (默认: 'day')
-- interval_multiplier (数字, 可选): 间隔倍数 (默认: 1)
-- start_date (字符串, 可选): 开始日期 YYYY-MM-DD 格式 (默认: '1970-01-01')
-- end_date (字符串, 可选): 结束日期 YYYY-MM-DD 格式 (默认: '2030-12-31')
-- adjust (字符串, 可选): 调整类型 ('none', 'qfq', 'hfq') (默认: 'none')
-- source (字符串, 可选): 数据源 ('eastmoney', 'eastmoney_direct', 'sina') (默认: 'eastmoney')
-- indicators_list (列表, 可选): 技术指标 (例如 ['SMA', 'EMA', 'RSI', 'MACD', 'BOLL', 'STOCH', 'ATR', 'CCI', 'ADX'])
+- interval_multiplier (数字): 间隔倍数 (默认: 1)
+- start_date (字符串): 开始日期 YYYY-MM-DD 格式 (默认: '1970-01-01')
+- end_date (字符串): 结束日期 YYYY-MM-DD 格式 (默认: '2030-12-31')
+- adjust (字符串): 调整类型 ('none', 'qfq', 'hfq') (默认: 'none')
+- source (字符串): 数据源 ('eastmoney', 'eastmoney_direct', 'sina') (默认: 'eastmoney')
+- indicators_list (列表, 可选): 技术指标 (例如 ['SMA', 'EMA', 'RSI', 'MACD', 'BOLL', 'STOCH', 'ATR', 'CCI', 'ADX', 'WILLR', 'AD', 'ADOSC', 'OBV', 'MOM', 'SAR', 'TSF', 'APO', 'AROON', 'AROONOSC', 'BOP', 'CMO', 'DX', 'MFI', 'MINUS_DI', 'MINUS_DM', 'PLUS_DI', 'PLUS_DM', 'PPO', 'ROC', 'ROCP', 'ROCR', 'ROCR100', 'TRIX', 'ULTOSC'])
 - recent_n (数字, 可选): 返回最近记录的数量 (默认: 100)
 
 ### `get_realtime_data`
 
-获取实时股票数据
+获取实时股票市场数据。'eastmoney_direct' 支持所有 A、B、H 股
 
 - symbol (字符串, 可选): 股票代码
-- source (字符串, 可选): 数据源 ('xueqiu', 'eastmoney_direct') (默认: 'xueqiu')
+- source (字符串): 数据源 ('xueqiu', 'eastmoney', 'eastmoney_direct') (默认: 'eastmoney_direct')
 
 ### `get_news_data`
 
-获取股票相关新闻数据
+获取股票相关新闻数据。
 
 - symbol (字符串): 股票代码
-- recent_n (数字, 可选): 返回最近记录的数量 (可选)
+- recent_n (数字, 可选): 返回最近记录的数量 (默认: 10)
 
 ### `get_balance_sheet`
 
-获取公司资产负债表数据
+获取公司资产负债表数据。
 
 - symbol (字符串): 股票代码
-- recent_n (数字, 可选): 返回最近记录的数量 (可选)
+- recent_n (数字, 可选): 返回最近记录的数量 (默认: 10)
 
 ### `get_income_statement`
 
-获取公司利润表数据
+获取公司利润表数据。
 
 - symbol (字符串): 股票代码
-- recent_n (数字, 可选): 返回最近记录的数量 (可选)
+- recent_n (数字, 可选): 返回最近记录的数量 (默认: 10)
 
 ### `get_cash_flow`
 
-获取公司现金流量表数据
+获取公司现金流量表数据。
 
 - symbol (字符串): 股票代码
-- source (字符串, 可选): 数据源 (默认: 'sina')
+- source (字符串): 数据源 (默认: 'sina')
+- recent_n (数字, 可选): 返回最近记录的数量 (默认: 10)
 
 ### `get_inner_trade_data`
 
-获取公司内部交易数据
+获取公司内部交易数据。
 
-- symbol (字符串, 可选): 股票代码
+- symbol (字符串): 股票代码
+
+### `get_financial_metrics`
+
+获取三大财务报表的关键财务指标。
+
+- symbol (字符串): 股票代码
+- recent_n (数字, 可选): 返回最近记录的数量 (默认: 10)
 
 ### `get_time_info`
 

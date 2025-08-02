@@ -46,6 +46,31 @@ def get_hist_data(
                 "ATR",
                 "CCI",
                 "ADX",
+                "WILLR",
+                "AD",
+                "ADOSC",
+                "OBV",
+                "MOM",
+                "SAR",
+                "TSF",
+                "APO",
+                "AROON",
+                "AROONOSC",
+                "BOP",
+                "CMO",
+                "DX",
+                "MFI",
+                "MINUS_DI",
+                "MINUS_DM",
+                "PLUS_DI",
+                "PLUS_DM",
+                "PPO",
+                "ROC",
+                "ROCP",
+                "ROCR",
+                "ROCR100",
+                "TRIX",
+                "ULTOSC",
             ]
         ]
         | None,
@@ -79,6 +104,40 @@ def get_hist_data(
             "ATR": (indicators.get_atr, {"window": 14}),
             "CCI": (indicators.get_cci, {"window": 14}),
             "ADX": (indicators.get_adx, {"window": 14}),
+            "WILLR": (indicators.get_willr, {"window": 14}),
+            "AD": (indicators.get_ad, {}),
+            "ADOSC": (indicators.get_adosc, {"fast_period": 3, "slow_period": 10}),
+            "OBV": (indicators.get_obv, {}),
+            "MOM": (indicators.get_mom, {"window": 10}),
+            "SAR": (indicators.get_sar, {"acceleration": 0.02, "maximum": 0.2}),
+            "TSF": (indicators.get_tsf, {"window": 14}),
+            "APO": (
+                indicators.get_apo,
+                {"fast_period": 12, "slow_period": 26, "ma_type": 0},
+            ),
+            "AROON": (indicators.get_aroon, {"window": 14}),
+            "AROONOSC": (indicators.get_aroonosc, {"window": 14}),
+            "BOP": (indicators.get_bop, {}),
+            "CMO": (indicators.get_cmo, {"window": 14}),
+            "DX": (indicators.get_dx, {"window": 14}),
+            "MFI": (indicators.get_mfi, {"window": 14}),
+            "MINUS_DI": (indicators.get_minus_di, {"window": 14}),
+            "MINUS_DM": (indicators.get_minus_dm, {"window": 14}),
+            "PLUS_DI": (indicators.get_plus_di, {"window": 14}),
+            "PLUS_DM": (indicators.get_plus_dm, {"window": 14}),
+            "PPO": (
+                indicators.get_ppo,
+                {"fast_period": 12, "slow_period": 26, "ma_type": 0},
+            ),
+            "ROC": (indicators.get_roc, {"window": 10}),
+            "ROCP": (indicators.get_rocp, {"window": 10}),
+            "ROCR": (indicators.get_rocr, {"window": 10}),
+            "ROCR100": (indicators.get_rocr100, {"window": 10}),
+            "TRIX": (indicators.get_trix, {"window": 30}),
+            "ULTOSC": (
+                indicators.get_ultosc,
+                {"window1": 7, "window2": 14, "window3": 28},
+            ),
         }
         temp = []
         for indicator in indicators_list:
@@ -171,6 +230,22 @@ def get_inner_trade_data(
 ) -> str:
     """Get company insider trading data."""
     df = ako.get_inner_trade_data(symbol, source="xueqiu")
+    return df.to_json(orient="records")
+
+
+@mcp.tool
+def get_financial_metrics(
+    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    recent_n: Annotated[
+        int | None, Field(description="Number of most recent records to return", ge=1)
+    ] = 10,
+) -> str:
+    """
+    Get key financial metrics from the three major financial statements.
+    """
+    df = ako.get_financial_metrics(symbol)
+    if recent_n is not None:
+        df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
