@@ -17,7 +17,7 @@ An MCP server based on [akshare-one](https://github.com/zwldarren/akshare-one), 
 
 ### `get_hist_data`
 
-Get historical stock market data.
+Get historical stock market data. 'eastmoney_direct' supports all A, B, H shares.
 
 - symbol (string): Stock code (e.g. '000001')
 - interval (string): Time interval ('minute','hour','day','week','month','year') (default: 'day')
@@ -26,49 +26,57 @@ Get historical stock market data.
 - end_date (string, optional): End date in YYYY-MM-DD format (default: '2030-12-31')
 - adjust (string, optional): Adjustment type ('none', 'qfq', 'hfq') (default: 'none')
 - source (string, optional): Data source ('eastmoney', 'eastmoney_direct', 'sina') (default: 'eastmoney')
-- indicators_list (list, optional): Technical indicators to add (e.g. ['SMA', 'EMA', 'RSI', 'MACD', 'BOLL', 'STOCH', 'ATR', 'CCI', 'ADX'])
+- indicators_list (list, optional): Technical indicators to add (e.g. ['SMA', 'EMA', 'RSI', 'MACD', 'BOLL', 'STOCH', 'ATR', 'CCI', 'ADX', 'WILLR', 'AD', 'ADOSC', 'OBV', 'MOM', 'SAR', 'TSF', 'APO', 'AROON', 'AROONOSC', 'BOP', 'CMO', 'DX', 'MFI', 'MINUS_DI', 'MINUS_DM', 'PLUS_DI', 'PLUS_DM', 'PPO', 'ROC', 'ROCP', 'ROCR', 'ROCR100', 'TRIX', 'ULTOSC'])
 - recent_n (number, optional): Number of most recent records to return (default: 100)
 
 ### `get_realtime_data`
 
-Get real-time stock data
+Get real-time stock market data. 'eastmoney_direct' supports all A, B, H shares.
 
 - symbol (string, optional): Stock code
-- source (string, optional): Data source ('xueqiu', 'eastmoney_direct') (default: 'xueqiu')
+- source (string, optional): Data source ('xueqiu', 'eastmoney', 'eastmoney_direct') (default: 'eastmoney_direct')
 
 ### `get_news_data`
 
-Get stock-related news data
+Get stock-related news data.
 
 - symbol (string): Stock code
-- recent_n (number, optional): Number of most recent records to return (optional)
+- recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_balance_sheet`
 
-Get company balance sheet data
+Get company balance sheet data.
 
 - symbol (string): Stock code
-- recent_n (number, optional): Number of most recent records to return (optional)
+- recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_income_statement`
 
-Get company income statement data
+Get company income statement data.
 
 - symbol (string): Stock code
-- recent_n (number, optional): Number of most recent records to return (optional)
+- recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_cash_flow`
 
-Get company cash flow statement data
+Get company cash flow statement data.
 
 - symbol (string): Stock code
 - source (string, optional): Data source (default: 'sina')
+- recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_inner_trade_data`
 
-Get company insider trading data
+Get company insider trading data.
 
-- symbol (string, optional): Stock code
+- symbol (string): Stock code
+
+### `get_financial_metrics`
+
+Get key financial metrics from the three major financial statements.
+
+- symbol (string): Stock code
+- recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_time_info`
 
