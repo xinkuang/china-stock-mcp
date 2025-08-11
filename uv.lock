@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.12"
 
 [[package]]
@@ -86,7 +86,7 @@ wheels = [
 
 [[package]]
 name = "akshare"
-version = "1.17.26"
+version = "1.17.31"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -107,27 +107,27 @@ dependencies = [
     { name = "urllib3" },
     { name = "xlrd" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/82/ca/b5eea0a3f2783ce8934495c7364425acbc70a021bdf7e79e8ba02d0ce0a8/akshare-1.17.26.tar.gz", hash = "sha256:3245df116965c46b16bb23da9c0372e61ea802d1f996243d26a64c3e16b513f1", size = 839911, upload-time = "2025-07-24T08:40:48.939Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d2/3e/4af0713126e90ba5b64792364118d2ab5d3c7e9c5ada565e35c7c5da4a30/akshare-1.17.31.tar.gz", hash = "sha256:b648a514e5e7d5c0a3b13ef0a707e1a0bb6a2b5099ab83dc259e81a147d0e331", size = 840838, upload-time = "2025-08-07T08:28:32.603Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/4a/f40c8adb970514eac84f3c0728ebb5e069f2e2ca202d9e94cbc6f50057fe/akshare-1.17.26-py3-none-any.whl", hash = "sha256:b8216f81336349d1069972c2916e7083a5e06eb21b4a9db2d5051e771c9fd4df", size = 1054174, upload-time = "2025-07-24T08:40:47.67Z" },
+    { url = "https://files.pythonhosted.org/packages/3a/27/8128bc4b9721e21592e4f6a8d6ab20addf470b1c743d1f866cf43ab15fcc/akshare-1.17.31-py3-none-any.whl", hash = "sha256:4f61c3a1cb69cbda04de92f58099f385d311cb04fdfacd7595d21e1bf09f9aa2", size = 1055726, upload-time = "2025-08-07T08:28:31.082Z" },
 ]
 
 [[package]]
 name = "akshare-one"
-version = "0.3.7"
+version = "0.3.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "akshare" },
     { name = "cachetools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f4/ad/95c530c61dd0f7448057ed679247cbc803335a2317c361844c79fe1aabf9/akshare_one-0.3.7.tar.gz", hash = "sha256:a0251c5710b1c80a344d2a633c016d1a8453701d1190dd9f205ff899c4b6d8bb", size = 33582, upload-time = "2025-08-02T11:02:24.142Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8d/9d/40517a7ceaf7865314b7861eefce0fca1e976fec85893a1d48a475e719d8/akshare_one-0.3.8.tar.gz", hash = "sha256:4417f8e3bacc22d65151cd3b724efd057e07240079402a273d6dd50361399938", size = 32972, upload-time = "2025-08-09T05:55:15.637Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/ec/d0d8bd737be45adbd147c1b9239cca4fe897889f7205020d01b09d1570ff/akshare_one-0.3.7-py3-none-any.whl", hash = "sha256:bfc86af7209c732d22ac114c378d01ce6a49c59d7cf558f08415235667e71b7f", size = 39953, upload-time = "2025-08-02T11:02:22.857Z" },
+    { url = "https://files.pythonhosted.org/packages/c3/0a/0aea6b471cd4c6cc9b75e4021451a4bbe426ed323a82630c61b8baf5cb0b/akshare_one-0.3.8-py3-none-any.whl", hash = "sha256:98845467ade6753e2a2d974c02edfdf37ef06457ad7db619dcfb2fbae45ce1cd", size = 39609, upload-time = "2025-08-09T05:55:13.095Z" },
 ]
 
 [[package]]
 name = "akshare-one-mcp"
-version = "0.2.3"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "akshare-one" },
