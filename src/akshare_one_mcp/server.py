@@ -212,7 +212,7 @@ def get_income_statement(
 @mcp.tool
 def get_cash_flow(
     symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
-    source: Annotated[str, Field(description="Data source")] = "sina",
+    source: Annotated[Literal["sina"], Field(description="Data source")] = "sina",
     recent_n: Annotated[
         int | None, Field(description="Number of most recent records to return", ge=1)
     ] = 10,
