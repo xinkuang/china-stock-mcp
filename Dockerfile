@@ -11,5 +11,8 @@ COPY src ./src
 RUN pip install --upgrade pip setuptools build wheel \
     && pip install .
 
-# Default command to start MCP over stdio
+# Expose port for HTTP server
+EXPOSE 8081
+
+# Default command to start MCP over HTTP
 CMD ["akshare-one-mcp"]

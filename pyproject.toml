@@ -9,6 +9,7 @@ requires-python = ">=3.12"
 dependencies = [
     "akshare-one>=0.3.10",
     "fastmcp>=2.11.3",
+    "uvicorn>=0.35.0",
 ]
 keywords = ["akshare", "stock", "mcp", "mcp-server"]
 
