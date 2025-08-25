@@ -1,13 +1,13 @@
 [project]
 name = "akshare-one-mcp"
-version = "0.3.1"
+version = "0.3.2"
 description = "MCP server that provides access to Chinese stock market data using akshare-one"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "zwldarren", email = "zwldarren@gmail.com" }]
 requires-python = ">=3.12"
 dependencies = [
-    "akshare-one>=0.3.8",
+    "akshare-one>=0.3.10",
     "fastmcp>=2.11.3",
 ]
 keywords = ["akshare", "stock", "mcp", "mcp-server"]

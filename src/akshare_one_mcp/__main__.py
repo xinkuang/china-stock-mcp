@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    # mcp.run(transport="streamable-http", port=8902)
+    # mcp.run(transport="streamable-http", port=8081)
     mcp.run()
 
 
