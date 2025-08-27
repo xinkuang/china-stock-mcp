@@ -10,5 +10,5 @@ startCommand:
   commandFunction:
     # A JS function that produces the CLI command based on the given config to start the MCP on HTTP.
     |-
-    (config) => ({ command: 'akshare-one-mcp', args: [] })
+    (config) => ({ command: 'akshare-one-mcp', args: ['--streamable-http', '--host', '0.0.0.0', '--port', '8081'] })
   exampleConfig: {}
