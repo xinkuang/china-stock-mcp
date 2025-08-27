@@ -82,6 +82,17 @@
 
 获取当前时间(ISO格式)、时间戳和最近一个交易日。
 
+## 运行模式
+
+服务器支持两种模式：stdio 和 streamable-http
+
+**命令行参数:**
+- `--streamable-http`: 启用 HTTP 模式 (默认: stdio 模式)
+- `--host`: HTTP 模式绑定的主机 (默认: 0.0.0.0)
+- `--port`: HTTP 模式监听的端口 (默认: 8081)
+
+**注意:** 使用 streamable-http 模式时，MCP 服务器会在 `http://{host}:{port}/mcp` 。默认配置时地址是 `http://0.0.0.0:8081/mcp`。
+
 ## 使用说明
 
 ### 通过 Smithery 安装
