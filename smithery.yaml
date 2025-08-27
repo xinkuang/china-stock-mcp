@@ -1,14 +1,14 @@
 # Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
 
 startCommand:
-  type: stdio
+  type: http
   configSchema:
     # JSON Schema defining the configuration options for the MCP.
     type: object
     default: {}
     description: No configuration required for akshare-one-mcp
   commandFunction:
-    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    # A JS function that produces the CLI command based on the given config to start the MCP on HTTP.
     |-
-    (config) => ({ command: 'akshare-one-mcp', args: [] })
+    (config) => ({ command: 'akshare-one-mcp', args: ['--streamable-http', '--host', '0.0.0.0', '--port', '8081'] })
   exampleConfig: {}

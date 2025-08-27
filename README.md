@@ -84,6 +84,17 @@ Get current time with ISO format, timestamp, and the last trading day.
 
 ## Usage Instructions
 
+### Running Modes
+
+The server supports two modes: stdio and streamable-http
+
+**Command Line Arguments:**
+- `--streamable-http`: Enable HTTP mode (default: stdio mode)
+- `--host`: Host to bind to in HTTP mode (default: 0.0.0.0)
+- `--port`: Port to listen on in HTTP mode (default: 8081)
+
+**Note:** When using streamable-http mode, the MCP server will be available at `http://{host}:{port}/mcp`. For the default configuration, this would be `http://0.0.0.0:8081/mcp`.
+
 ### Installing via Smithery
 
 To install akshare-one-mcp for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@zwldarren/akshare-one-mcp):
@@ -94,11 +105,7 @@ npx -y @smithery/cli install @zwldarren/akshare-one-mcp --client claude
 
 ### Installing via `uv`
 
-Install directly from PyPI using uv:
-
-```bash
-uv pip install akshare-one-mcp
-```
+Install [uv](<https://docs.astral.sh/uv/getting-started/installation/>) if you haven't already.
 
 Add the following configuration:
 
@@ -120,15 +127,13 @@ Add the following configuration:
     cd akshare-one-mcp
     ```
 
-2. Install [uv](<https://docs.astral.sh/uv/getting-started/installation/>) if you haven't already.
-
-3. Install dependencies:
+2. Install dependencies:
 
     ```bash
     uv sync
     ```
 
-4. Add the following configuration:
+3. Add the following configuration:
 
     ```json
     "mcpServers": {
