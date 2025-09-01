@@ -1,150 +1,338 @@
 # AKShare One MCP Server
 
 <div align="center">
-  <a href="README.md">English</a> | 
+  <a href="README.md">English</a> |
   <a href="README_zh.md">中文</a>
 </div>
 
-[![smithery badge](https://smithery.ai/badge/@zwldarren/akshare-one-mcp)](https://smithery.ai/server/@zwldarren/akshare-one-mcp)
 
-An MCP server based on [akshare-one](https://github.com/zwldarren/akshare-one), providing interfaces for China stock market data. It offers a set of tools for retrieving financial information including historical stock data, real-time data, news data, financial statements, etc.
+一款基于 [akshare-one](https://github.com/zwldarren/akshare-one) 构建的 MCP (Model Context Protocol) 服务器，为中国股市数据提供接口。提供了一系列工具，用于获取财务信息，包括历史股票数据、实时数据、新闻数据、财务报表等。
 
-<a href="https://glama.ai/mcp/servers/@zwldarren/akshare-one-mcp">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/@zwldarren/akshare-one-mcp/badge" alt="akshare-one-mcp MCP server" />
-</a>
 
-## Tools
 
-### `获取历史行情数据`
+## 🚀 核心特性
+
+- **双模式运行**: 支持 stdio 本地模式和 HTTP 网络模式
+- **丰富的财务数据**: 涵盖 A/B/H 股数据的全方位获取
+- **实时数据**: 支持实时股价、交易信息等
+- **财务报表**: 资产负债表、利润表、现金流量表等
+- **技术指标**: 30+ 种技术指标自动计算和添加
+- **新闻数据**: 股票相关新闻和公告信息
+- **易用性**: 简单配置即可集成到 AI 助手 (Claude、Cursor 等)
+- **容器化**: 支持 Docker 部署
+
+## 🛠️ 架构概览
+
+### 主要组件
+
+- `server.py`: MCP 服务器核心，定义所有工具和数据接口
+- `__main__.py`: 命令行入口，支持多种运行模式
+- FastMCP 框架: 处理 MCP 协议通信
+- akshare-one 库: 提供底层的中国股市数据获取能力
+
+### 支持的数据源
+
+- 东方财富 (eastmoney, eastmoney_direct)
+- 新浪财经 (sina)
+- 雪球 (xueqiu)
+## 📋 可用工具
+
+### 1. `获取历史行情数据` (get_hist_data)
 
 获取股票的历史行情数据，支持多种数据源和技术指标。
 
-- symbol (string): Stock code (e.g. '000001')
-- interval (string): Time interval ('minute','hour','day','week','month','year') (default: 'day')
-- interval_multiplier (number, optional): Interval multiplier (default: 1)
-- start_date (string, optional): Start date in YYYY-MM-DD format (default: '1970-01-01')
-- end_date (string, optional): End date in YYYY-MM-DD format (default: '2030-12-31')
-- adjust (string, optional): Adjustment type ('none', 'qfq', 'hfq') (default: 'none')
-- source (string, optional): Data source ('eastmoney', 'eastmoney_direct', 'sina') (default: 'eastmoney')
-- indicators_list (list, optional): Technical indicators to add (e.g. ['SMA', 'EMA', 'RSI', 'MACD', 'BOLL', 'STOCH', 'ATR', 'CCI', 'ADX', 'WILLR', 'AD', 'ADOSC', 'OBV', 'MOM', 'SAR', 'TSF', 'APO', 'AROON', 'AROONOSC', 'BOP', 'CMO', 'DX', 'MFI', 'MINUS_DI', 'MINUS_DM', 'PLUS_DI', 'PLUS_DM', 'PPO', 'ROC', 'ROCP', 'ROCR', 'ROCR100', 'TRIX', 'ULTOSC'])
-- recent_n (number, optional): Number of most recent records to return (default: 100)
+**参数:**
+- `symbol` (string): 股票代码，如 '000001'
+- `interval` (string): 时间周期 ('minute','hour','day','week','month','year')，默认为 'day'
+- `interval_multiplier` (number): 时间周期乘数，默认为 1
+- `start_date` (string): 开始日期，格式为 'YYYY-MM-DD'，默认为 '1970-01-01'
+- `end_date` (string): 结束日期，格式为 'YYYY-MM-DD'，默认为 '2030-12-31'
+- `adjust` (string): 复权类型 ('none', 'qfq', 'hfq')，默认为 'none'
+- `source` (string): 数据源 ('eastmoney', 'eastmoney_direct', 'sina')，默认为 'eastmoney'
+- `indicators_list` (list): 要添加的技术指标列表
+- `recent_n` (number): 返回最近 N 条记录的数量，默认为 100
 
-### `get_realtime_data`
+**支持的技术指标** (共 30+ 种):
+SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC
+
+### 2. `获取实时行情数据` (get_realtime_data)
 
 获取股票的实时行情数据，支持多种数据源。
 
-- symbol (string, optional): Stock code
-- source (string, optional): Data source ('xueqiu', 'eastmoney', 'eastmoney_direct') (default: 'eastmoney_direct')
+**参数:**
+- `symbol` (string, 可选): 股票代码
+- `source` (string, 可选): 数据源 ('xueqiu', 'eastmoney', 'eastmoney_direct')，默认为 'eastmoney_direct'
 
-### `获取新闻数据`
+### 3. `获取新闻数据` (get_news_data)
 
 获取股票相关的新闻数据。
 
-- symbol (string): Stock code
-- recent_n (number, optional): Number of most recent records to return (default: 10)
+**参数:**
+- `symbol` (string): 股票代码
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
-### `get_balance_sheet`
+### 4. `获取资产负债表` (get_balance_sheet)
 
 获取公司的资产负债表数据。
 
-- symbol (string): Stock code
-- recent_n (number, optional): Number of most recent records to return (default: 10)
+**参数:**
+- `symbol` (string): 股票代码
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
-### `get_income_statement`
+### 5. `获取利润表` (get_income_statement)
 
 获取公司的利润表数据。
 
-- symbol (string): Stock code
-- recent_n (number, optional): Number of most recent records to return (default: 10)
+**参数:**
+- `symbol` (string): 股票代码
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
-### `get_cash_flow`
+### 6. `获取现金流量表` (get_cash_flow)
 
 获取公司的现金流量表数据。
 
-- symbol (string): Stock code
-- source (string, optional): Data source (default: 'sina')
-- recent_n (number, optional): Number of most recent records to return (default: 10)
+**参数:**
+- `symbol` (string): 股票代码
+- `source` (string, 可选): 数据源，默认为 'sina'
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
-### `get_inner_trade_data`
+### 7. `获取内部交易数据` (get_inner_trade_data)
 
-Get company insider trading data.
+获取公司的内部交易数据。
 
-- symbol (string): Stock code
+**参数:**
+- `symbol` (string): 股票代码
 
-### `get_financial_metrics`
+### 8. `获取财务指标` (get_financial_metrics)
 
-Get key financial metrics from the three major financial statements.
+获取三大财务报表的关键财务指标。
 
-- symbol (string): Stock code
-- recent_n (number, optional): Number of most recent records to return (default: 10)
+**参数:**
+- `symbol` (string): 股票代码
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
-### `get_time_info`
+### 9. `获取时间信息` (get_time_info)
 
-Get current time with ISO format, timestamp, and the last trading day.
+获取当前时间的ISO格式、时间戳和最近的交易日。
 
-## Usage Instructions
+## 🚀 安装和运行
 
-### Running Modes
+### 方法一: 使用 Smithery（推荐）
 
-The server supports two modes: stdio and streamable-http
-
-**Command Line Arguments:**
-- `--streamable-http`: Enable HTTP mode (default: stdio mode)
-- `--host`: Host to bind to in HTTP mode (default: 0.0.0.0)
-- `--port`: Port to listen on in HTTP mode (default: 8081)
-
-**Note:** When using streamable-http mode, the MCP server will be available at `http://{host}:{port}/mcp`. For the default configuration, this would be `http://0.0.0.0:8081/mcp`.
-
-### Installing via Smithery
-
-To install akshare-one-mcp for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@zwldarren/akshare-one-mcp):
+通过 [Smithery](https://smithery.ai/server/@zwldarren/akshare-one-mcp) 自动安装到 Claude Desktop：
 
 ```bash
 npx -y @smithery/cli install @zwldarren/akshare-one-mcp --client claude
 ```
 
-### Installing via `uv`
+### 方法二: 使用 Docker
 
-Install [uv](<https://docs.astral.sh/uv/getting-started/installation/>) if you haven't already.
+#### 1. 拉取镜像
+```bash
+docker pull ghcr.io/zwldarren/akshare-one-mcp:latest
+```
 
-Add the following configuration:
+#### 2. 运行容器
+```bash
+docker run -p 8081:8081 ghcr.io/zwldarren/akshare-one-mcp:latest
+```
 
+### 方法三: 本地源代码安装
+
+#### 1. 环境要求
+- Python 3.12+
+- Git
+- uv (推荐的 Python 包管理器)
+
+#### 2. 克隆仓库
+```bash
+git clone https://github.com/xinkuang/akshare-one-mcp
+cd akshare-one-mcp
+```
+
+#### 3. 安装依赖
+```bash
+# 推荐使用 uv 包管理器
+uv sync
+
+# 或者使用 pip
+pip install -r requirements.txt
+```
+
+#### 4. 运行服务器
+
+**stdio 模式 (默认，适用于本地 MCP 客户端):**
+```bash
+akshare-one-mcp
+# 或
+python -m akshare_one_mcp
+```
+
+**HTTP 模式 (适用于远程访问):**
+```bash
+akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
+```
+
+服务器将在 `http://localhost:8081/mcp` 提供服务。
+
+## ⚙️ MCP 配置示例
+
+### Claude Desktop 配置
+
+编辑 `claude_desktop_config.json`：
+
+**方式一: 本地源代码**
 ```json
-"mcpServers": {
-    "akshare-one-mcp": {
-        "command": "uvx",
-        "args": ["akshare-one-mcp"]
+{
+  "mcpServers": {
+    "china-stock-mcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/path/to/akshare-one-mcp",
+        "run",
+        "akshare-one-mcp"
+      ]
     }
+  }
 }
 ```
 
-### Installing via local source code
-
-1. Clone this repository:
-
-    ```bash
-    git clone https://github.com/zwldarren/akshare-one-mcp.git
-    cd akshare-one-mcp
-    ```
-
-2. Install dependencies:
-
-    ```bash
-    uv sync
-    ```
-
-3. Add the following configuration:
-
-    ```json
-    "mcpServers": {
-        "akshare-one-mcp": {
-            "command": "uv",
-            "args": [
-                "--directory",
-                "/path/to/akshare-one-mcp",
-                "run",
-                "akshare-one-mcp"
-            ]
-        }
+**方式二: 通过 uvx**
+```json
+{
+  "mcpServers": {
+    "china-stock-mcp": {
+      "command": "uvx",
+      "args": ["akshare-one-mcp"]
     }
-    ```
+  }
+}
+```
+
+**方式三: HTTP 模式**
+```json
+{
+  "mcpServers": {
+    "china-stock-mcp": {
+      "command": "uvx",
+      "args": ["akshare-one-mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"],
+      "env": {
+        "MCP_BASE_URL": "http://localhost:8081/mcp"
+      }
+    }
+  }
+}
+```
+
+### 其他 AI 客户端配置
+
+**Cursor:**
+```json
+{
+  "mcpServers": {
+    "china-stock-mcp": {
+      "command": "uvx",
+      "args": ["akshare-one-mcp"]
+    }
+  }
+}
+```
+
+**Clion with MCP:**
+```json
+{
+  "mcpServers": {
+    "china-stock-mcp": {
+      "command": "uvx",
+      "args": ["akshare-one-mcp"]
+    }
+  }
+}
+```
+
+## 🏃‍♂️ 命令行参数
+
+- `--streamable-http`: 启用 HTTP 可流式模式 (默认: stdio 模式)
+- `--host`: HTTP 模式下的绑定主机 (默认: 0.0.0.0)
+- `--port`: HTTP 模式下的监听端口 (默认: 8081)
+
+## 📊 数据支持范围
+
+### 股票市场
+- A股 (上证、深证)
+- B股
+- H股 (港股)
+- 中小板、创业板、新三板
+
+### 数据类型
+- 历史行情数据 (分钟级、小时级、日级、周级、月级、年级)
+- 实时行情数据
+- 技术指标计算
+- 新闻资讯
+- 财务报表 (资产负债表、利润表、现金流量表)
+- 财务指标
+- 内部交易数据
+
+## 🔧 开发和贡献
+
+### 开发环境设置
+
+1. 克隆仓库
+```bash
+git clone https://github.com/xinkuang/akshare-one-mcp
+cd akshare-one-mcp
+```
+
+2. 安装开发依赖
+```bash
+uv sync --dev
+```
+
+3. 进入开发模式
+```bash
+uv run akshare-one-mcp
+```
+
+### 代码结构
+
+```
+src/akshare_one_mcp/
+├── __init__.py
+├── __main__.py    # 命令行入口，处理启动参数
+├── server.py      # MCP 服务器核心，定义所有工具
+├── mcp.json       # MCP 配置规范 (可选)
+└── py.typed       # 类型标注文件
+```
+
+### 添加新工具
+
+在 `server.py` 中使用 `@mcp.tool` 装饰器添加新工具：
+
+```python
+@mcp.tool(name="工具中文名称", description="工具的中文描述")
+def your_tool_name(param1: Annotated[str, Field(description="参数描述")]) -> str:
+    """工具详情描述"""
+    # 实现逻辑
+    pass
+```
+
+## 📝 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## 🙋‍♂️ 常见问题
+
+**Q: 为什么无法获取数据？**
+A: 请检查网络连接和数据源可用性。某些数据源可能有访问限制。
+
+**Q: HTTP 模式下无法连接？**
+A: 确认端口 8081 未被其他服务占用，且防火墙允许相应端口的访问。
+
+**Q: 如何更新到最新版本？**
+A: 使用 Smithery 安装的可以自动更新，手动安装的请重新拉取仓库代码。
+
