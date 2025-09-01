@@ -4,8 +4,8 @@ import logging # 用于日志记录
 import uvicorn # 用于 ASGI 服务器
 from starlette.middleware.cors import CORSMiddleware # 用于处理跨域资源共享 (CORS)
 
-# 从 akshare_one_mcp.server 模块导入 mcp 实例
-from akshare_one_mcp.server import mcp
+
+from server import mcp
 
 
 # 初始化日志记录器
