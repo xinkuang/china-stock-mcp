@@ -1,6 +1,6 @@
 [project]
 name = "china_stock_mcp"
-version = "0.1"
+version = "0.2"
 description = "MCP server that provides access to Chinese stock market data using akshare"
 readme = "README.md"
 license = { text = "MIT" }
