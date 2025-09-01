@@ -231,9 +231,9 @@ akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
       "command": "uv",
       "args": [
         "--directory",
-        "/path/to/akshare-one-mcp",
+        "/path/to/china-stock-mcp",
         "run",
-        "akshare-one-mcp"
+        "china-stock-mcp"
       ]
     }
   }
@@ -246,7 +246,7 @@ akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-      "args": ["akshare-one-mcp"]
+      "args": ["china-stock-mcp"]
     }
   }
 }
@@ -258,7 +258,7 @@ akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-      "args": ["akshare-one-mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"],
+      "args": ["china-stock-mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"],
       "env": {
         "MCP_BASE_URL": "http://localhost:8081/mcp"
       }

@@ -1,6 +1,6 @@
 [project]
-name = "china-stock-mcp"
-version = "0.0.1"
+name = "china_stock_mcp"
+version = "0.1"
 description = "MCP server that provides access to Chinese stock market data using akshare"
 readme = "README.md"
 license = { text = "MIT" }
@@ -18,7 +18,7 @@ Homepage = "https://github.com/xinkuang/china-stock-mcp"
 Repository = "https://github.com/xinkuang/china-stock-mcp.git"
 
 [project.scripts]
-china-stock-mcp = "china-stock-mcp.__main__:main"
+china_stock_mcp = "__main__:main"
 
 [build-system]
 requires = ["uv_build"]
