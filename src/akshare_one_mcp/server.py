@@ -269,3 +269,251 @@ def get_time_info() -> dict:
         "timestamp": local_time.timestamp(),
         "last_trading_day": last_trading_day,
     }
+@mcp.tool(name="获取股票基本概要信息", description="获取指定股票的基本概要信息，支持 A 股和港股")
+def get_stock_basic_info(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001' 代表A股, '00700' 代表港股)")],
+    market_type: Annotated[
+        Literal["A股", "港股"], Field(description="市场类型: A股, 港股。默认: A股")
+    ] = "A股",
+    data_source: Annotated[
+        Literal["eastmoney", "xueqiu", "cninfo", "xq"],
+        Field(description="数据来源: eastmoney(东方财富), xueqiu(雪球), cninfo(巨潮资讯), xq(雪球)。默认: eastmoney"),
+    ] = "eastmoney",
+    recent_n: Annotated[
+        int | None, Field(description="返回最近N条记录的数量，仅适用于部分接口", ge=1)
+    ] = None,
+) -> str:
+    """获取股票基本概要信息，支持 A 股和港股"""
+    try:
+        if market_type == "A股":
+            if data_source == "eastmoney":
+                df = ak.stock_individual_info_em(symbol)
+            elif data_source == "xueqiu":
+                df = ak.stock_individual_basic_info_xq(symbol="SH" + symbol)
+            elif data_source == "cninfo":
+                df = ak.stock_profile_cninfo(symbol)
+            elif data_source == "xq":
+                df = ak.stock_individual_basic_info_hk_xq(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for A股: {data_source}")
+        elif market_type == "港股":
+            if data_source == "eastmoney":
+                df = ak.stock_hk_company_profile_em(symbol)
+            elif data_source == "xq":
+                df = ak.stock_individual_basic_info_hk_xq(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for 港股: {data_source}")
+        else:
+            raise ValueError(f"Unsupported market_type: {market_type}")
+
+        if recent_n is not None:
+            df = df.tail(recent_n)
+
+        return df.to_json(orient="records")
+
+    except Exception as e:
+        return f"Error fetching stock basic info: {str(e)}"
+
+
+@mcp.tool(name="获取宏观经济数据", description="获取宏观经济数据")
+def get_macro_data(
+    indicator: Annotated[
+        str,
+        Field(
+            description="宏观经济指标，可选值包括: money_supply(货币供应量), gdp(GDP数据), cpi(CPI数据), pmi(PMI数据), stock_summary(股市概览)等",
+            examples=["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
+        )
+    ],
+    data_source: Annotated[
+        Literal["sina", "eastmoney", "cnstats"],
+        Field(description="数据来源: sina, eastmoney, cnstats。默认: sina"),
+    ] = "sina",
+    recent_n: Annotated[
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
+    ] = 10,
+) -> str:
+    """获取宏观经济数据"""
+    try:
+        if indicator == "money_supply":
+            if data_source == "sina":
+                df = ak.macro_china_money_supply()
+            else:
+                raise ValueError(f"Unsupported data_source for money_supply: {data_source}")
+        elif indicator == "gdp":
+            if data_source == "sina":
+                df = ak.macro_china_gdp()
+            elif data_source == "eastmoney":
+                df = ak.macro_china_gdp_yearly()
+            else:
+                raise ValueError(f"Unsupported data_source for gdp: {data_source}")
+        elif indicator == "cpi":
+            df = ak.macro_china_cpi_monthly()
+        elif indicator == "pmi":
+            df = ak.macro_china_pmi_yearly()
+        elif indicator == "stock_summary":
+            if data_source == "sina":
+                df = ak.stock_sse_summary()
+            elif data_source == "eastmoney":
+                df = ak.stock_szse_summary()
+            else:
+                raise ValueError(f"Unsupported data_source for stock_summary: {data_source}")
+        else:
+            raise ValueError(f"Unsupported indicator: {indicator}")
+
+        if recent_n is not None:
+            df = df.tail(recent_n)
+
+        return df.to_json(orient="records")
+
+    except Exception as e:
+        return f"Error fetching macro data: {str(e)}"
+
+
+@mcp.tool(name="分析散户和机构投资者投资情绪", description="分析散户和机构投资者的投资情绪")
+def get_investor_sentiment(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    indicator: Annotated[
+        Literal["retail_attention", "retail_bullish", "northbound_flow", "institution_research"],
+        Field(description="情绪指标: retail_attention(散户关注), retail_bullish(散户看涨), northbound_flow(北向资金), institution_research(机构调研)。默认: retail_attention"),
+    ] = "retail_attention",
+    data_source: Annotated[
+        Literal["eastmoney", "xueqiu"],
+        Field(description="数据来源: eastmoney, xueqiu。默认: eastmoney"),
+    ] = "eastmoney",
+    recent_n: Annotated[
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
+    ] = 10,
+) -> str:
+    """分析散户和机构投资者的投资情绪"""
+    try:
+        if indicator == "retail_attention":
+            if data_source == "eastmoney":
+                df = ak.stock_comment_detail_scrd_attention_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for retail_attention: {data_source}")
+        elif indicator == "retail_bullish":
+            if data_source == "eastmoney":
+                df = ak.stock_comment_detail_scrd_bullish_em(symbol)
+            elif data_source == "xueqiu":
+                df = ak.stock_comment_detail_scrd_desire_daily_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for retail_bullish: {data_source}")
+        elif indicator == "northbound_flow":
+            if data_source == "eastmoney":
+                df = ak.stock_hsgt_fund_flow_summary_em()
+            else:
+                raise ValueError(f"Unsupported data_source for northbound_flow: {data_source}")
+        elif indicator == "institution_research":
+            if data_source == "eastmoney":
+                df = ak.stock_institute_recommend_detail(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for institution_research: {data_source}")
+        else:
+            raise ValueError(f"Unsupported indicator: {indicator}")
+
+        if recent_n is not None:
+            df = df.tail(recent_n)
+
+        return df.to_json(orient="records")
+
+    except Exception as e:
+        return f"Error fetching investor sentiment data: {str(e)}"
+
+
+@mcp.tool(name="获取股东情况", description="获取指定股票的股东情况")
+def get_shareholder_info(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    shareholder_type: Annotated[
+        Literal["top_circulating", "top_holders", "shareholder_count", "pledge_ratio"],
+        Field(description="股东类型: top_circulating(十大流通股东), top_holders(十大股东), shareholder_count(股东户数), pledge_ratio(股权质押)。默认: top_circulating"),
+    ] = "top_circulating",
+    data_source: Annotated[
+        Literal["eastmoney", "cninfo"],
+        Field(description="数据来源: eastmoney, cninfo。默认: eastmoney"),
+    ] = "eastmoney",
+    recent_n: Annotated[
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
+    ] = 10,
+) -> str:
+    """获取股东情况"""
+    try:
+        if shareholder_type == "top_circulating":
+            if data_source == "eastmoney":
+                df = ak.stock_ggcg_em(symbol)
+            elif data_source == "cninfo":
+                df = ak.stock_gpzy_profile_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for top_circulating: {data_source}")
+        elif shareholder_type == "top_holders":
+            if data_source == "eastmoney":
+                df = ak.stock_gpzy_distribute_statistics_company_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for top_holders: {data_source}")
+        elif shareholder_type == "shareholder_count":
+            if data_source == "cninfo":
+                df = ak.stock_gpzy_pledge_ratio_detail_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for shareholder_count: {data_source}")
+        elif shareholder_type == "pledge_ratio":
+            if data_source == "eastmoney":
+                df = ak.stock_gpzy_pledge_ratio_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for pledge_ratio: {data_source}")
+        else:
+            raise ValueError(f"Unsupported shareholder_type: {shareholder_type}")
+
+        if recent_n is not None:
+            df = df.tail(recent_n)
+
+        return df.to_json(orient="records")
+
+    except Exception as e:
+        return f"Error fetching shareholder info: {str(e)}"
+
+
+@mcp.tool(name="获取产品情况", description="获取指定股票公司的主要产品或业务构成")
+def get_product_info(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    info_type: Annotated[
+        Literal["business_composition", "product_type", "industry_category"],
+        Field(description="信息类型: business_composition(主营构成), product_type(产品类型), industry_category(行业分类)。默认: business_composition"),
+    ] = "business_composition",
+    data_source: Annotated[
+        Literal["ths", "cninfo"],
+        Field(description="数据来源: ths(同花顺), cninfo(巨潮资讯)。默认: ths"),
+    ] = "ths",
+    recent_n: Annotated[
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
+    ] = 10,
+) -> str:
+    """获取产品情况"""
+    try:
+        if info_type == "business_composition":
+            if data_source == "ths":
+                df = ak.stock_zyjs_ths(symbol)
+            elif data_source == "cninfo":
+                df = ak.stock_zygc_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for business_composition: {data_source}")
+        elif info_type == "product_type":
+            if data_source == "ths":
+                df = ak.stock_zyjs_ths(symbol)
+            elif data_source == "cninfo":
+                df = ak.stock_zygc_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for product_type: {data_source}")
+        elif info_type == "industry_category":
+            if data_source == "cninfo":
+                df = ak.stock_industry_category_cninfo(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for industry_category: {data_source}")
+        else:
+            raise ValueError(f"Unsupported info_type: {info_type}")
+
+        if recent_n is not None:
+            df = df.tail(recent_n)
+
+        return df.to_json(orient="records")
+
+    except Exception as e:
+        return f"Error fetching product info: {str(e)}"
