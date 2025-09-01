@@ -189,7 +189,7 @@ docker run -p 8081:8081 ghcr.io/zwldarren/akshare-one-mcp:latest
 #### 2. 克隆仓库
 ```bash
 git clone https://github.com/xinkuang/china-stock-mcp
-cd akshare-one-mcp
+cd china-stock-mcp
 ```
 
 #### 3. 安装依赖
@@ -205,9 +205,9 @@ pip install -r requirements.txt
 
 **stdio 模式 (默认，适用于本地 MCP 客户端):**
 ```bash
-akshare-one-mcp
+china-stock-mcp
 # 或
-python -m akshare_one_mcp
+python -m china-stock-mcp
 ```
 
 **HTTP 模式 (适用于远程访问):**
@@ -275,7 +275,7 @@ akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-      "args": ["akshare-one-mcp"]
+      "args": ["china-stock-mcp"]
     }
   }
 }
@@ -287,7 +287,7 @@ akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-      "args": ["akshare-one-mcp"]
+      "args": ["china-stock-mcp"]
     }
   }
 }
@@ -333,7 +333,7 @@ uv sync --dev
 
 3. 进入开发模式
 ```bash
-uv run akshare-one-mcp
+uv run china-stock-mcp
 ```
 
 ### 代码结构
