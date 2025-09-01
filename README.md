@@ -107,6 +107,55 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 ### 9. `获取时间信息` (get_time_info)
 
 获取当前时间的ISO格式、时间戳和最近的交易日。
+### 10. `获取股票基本概要信息` (get_stock_basic_info)
+
+获取指定股票的基本概要信息，支持 A 股和港股。
+
+**参数:**
+- `symbol` (string): 股票代码，如 '000001' 代表A股, '00700' 代表港股
+- `market_type` (string): 市场类型 ('A股', '港股')，默认为 'A股'
+- `data_source` (string): 数据来源 ('eastmoney', 'xueqiu', 'cninfo', 'xq')，默认为 'eastmoney'
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，仅适用于部分接口，默认为 None
+
+### 11. `获取宏观经济数据` (get_macro_data)
+
+获取宏观经济数据，包括货币供应量、GDP、CPI、PMI等指标。
+
+**参数:**
+- `indicator` (string): 宏观经济指标 ('money_supply', 'gdp', 'cpi', 'pmi', 'stock_summary')
+- `data_source` (string): 数据来源 ('sina', 'eastmoney', 'cnstats')，默认为 'sina'
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
+
+### 12. `分析散户和机构投资者投资情绪` (get_investor_sentiment)
+
+分析散户和机构投资者的投资情绪，包括散户关注度、看涨情绪、北向资金流动、机构调研等。
+
+**参数:**
+- `symbol` (string): 股票代码，如 '000001'
+- `indicator` (string): 情绪指标 ('retail_attention', 'retail_bullish', 'northbound_flow', 'institution_research')，默认为 'retail_attention'
+- `data_source` (string): 数据来源 ('eastmoney', 'xueqiu')，默认为 'eastmoney'
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
+
+### 13. `获取股东情况` (get_shareholder_info)
+
+获取指定股票的股东情况，包括十大流通股东、十大股东、股东户数、股权质押等。
+
+**参数:**
+- `symbol` (string): 股票代码，如 '000001'
+- `shareholder_type` (string): 股东类型 ('top_circulating', 'top_holders', 'shareholder_count', 'pledge_ratio')，默认为 'top_circulating'
+- `data_source` (string): 数据来源 ('eastmoney', 'cninfo')，默认为 'eastmoney'
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
+
+### 14. `获取产品情况` (get_product_info)
+
+获取指定股票公司的主要产品或业务构成，包括主营构成、产品类型、行业分类等。
+
+**参数:**
+- `symbol` (string): 股票代码，如 '000001'
+- `info_type` (string): 信息类型 ('business_composition', 'product_type', 'industry_category')，默认为 'business_composition'
+- `data_source` (string): 数据来源 ('ths', 'cninfo')，默认为 'ths'
+- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
+
 
 ## 🚀 安装和运行
 
