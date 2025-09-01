@@ -18,7 +18,7 @@ Homepage = "https://github.com/xinkuang/china-stock-mcp"
 Repository = "https://github.com/xinkuang/china-stock-mcp.git"
 
 [project.scripts]
-china_stock_mcp = "__main__:main"
+china_stock_mcp = "china_stock_mcp.__main__:main"
 
 [build-system]
 requires = ["uv_build"]
