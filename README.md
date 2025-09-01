@@ -1,11 +1,4 @@
-# AKShare One MCP Server
-
-<div align="center">
-  <a href="README.md">English</a> |
-  <a href="README_zh.md">中文</a>
-</div>
-
-
+# china-stock-mcp
 一款基于 [akshare-one](https://github.com/zwldarren/akshare-one) 构建的 MCP (Model Context Protocol) 服务器，为中国股市数据提供接口。提供了一系列工具，用于获取财务信息，包括历史股票数据、实时数据、新闻数据、财务报表等。
 
 
