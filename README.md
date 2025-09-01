@@ -15,9 +15,9 @@ An MCP server based on [akshare-one](https://github.com/zwldarren/akshare-one), 
 
 ## Tools
 
-### `get_hist_data`
+### `获取历史行情数据`
 
-Get historical stock market data. 'eastmoney_direct' supports all A, B, H shares.
+获取股票的历史行情数据，支持多种数据源和技术指标。
 
 - symbol (string): Stock code (e.g. '000001')
 - interval (string): Time interval ('minute','hour','day','week','month','year') (default: 'day')
@@ -31,35 +31,35 @@ Get historical stock market data. 'eastmoney_direct' supports all A, B, H shares
 
 ### `get_realtime_data`
 
-Get real-time stock market data. 'eastmoney_direct' supports all A, B, H shares.
+获取股票的实时行情数据，支持多种数据源。
 
 - symbol (string, optional): Stock code
 - source (string, optional): Data source ('xueqiu', 'eastmoney', 'eastmoney_direct') (default: 'eastmoney_direct')
 
-### `get_news_data`
+### `获取新闻数据`
 
-Get stock-related news data.
+获取股票相关的新闻数据。
 
 - symbol (string): Stock code
 - recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_balance_sheet`
 
-Get company balance sheet data.
+获取公司的资产负债表数据。
 
 - symbol (string): Stock code
 - recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_income_statement`
 
-Get company income statement data.
+获取公司的利润表数据。
 
 - symbol (string): Stock code
 - recent_n (number, optional): Number of most recent records to return (default: 10)
 
 ### `get_cash_flow`
 
-Get company cash flow statement data.
+获取公司的现金流量表数据。
 
 - symbol (string): Stock code
 - source (string, optional): Data source (default: 'sina')

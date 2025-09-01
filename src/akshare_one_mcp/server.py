@@ -8,31 +8,30 @@ from fastmcp import FastMCP
 from pydantic import Field
 
 
-mcp = FastMCP(name="akshare-one-mcp")
+mcp = FastMCP(name="china-stock-mcp") # 初始化 FastMCP 服务器实例
 
-
-@mcp.tool
+@mcp.tool(name="获取历史行情数据", description="获取股票的历史行情数据，支持多种数据源和技术指标")
 def get_hist_data(
-    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     interval: Annotated[
         Literal["minute", "hour", "day", "week", "month", "year"],
-        Field(description="Time interval"),
+        Field(description="时间周期: minute, hour, day, week, month, year。默认:day"),
     ] = "day",
     interval_multiplier: Annotated[
-        int, Field(description="Interval multiplier", ge=1)
+        int, Field(description="时间周期乘数", ge=1)
     ] = 1,
     start_date: Annotated[
-        str, Field(description="Start date in YYYY-MM-DD format")
+        str, Field(description="开始日期，格式为 YYYY-MM-DD")
     ] = "1970-01-01",
     end_date: Annotated[
-        str, Field(description="End date in YYYY-MM-DD format")
+        str, Field(description="结束日期，格式为 YYYY-MM-DD")
     ] = "2030-12-31",
     adjust: Annotated[
-        Literal["none", "qfq", "hfq"], Field(description="Adjustment type")
+        Literal["none", "qfq", "hfq"], Field(description="复权类型: none, qfq(前复权), hfq(后复权)。默认：none")
     ] = "none",
     source: Annotated[
         Literal["eastmoney", "eastmoney_direct", "sina"],
-        Field(description="Data source"),
+        Field(description="数据来源: xueqiu, eastmoney, eastmoney_direct。默认：eastmoney"),
     ] = "eastmoney",
     indicators_list: Annotated[
         list[
@@ -74,13 +73,13 @@ def get_hist_data(
             ]
         ]
         | None,
-        Field(description="Technical indicators to add"),
+        Field(description="要添加的技术指标: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC"),
     ] = None,
     recent_n: Annotated[
-        int | None, Field(description="Number of most recent records to return", ge=1)
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
     ] = 100,
 ) -> str:
-    """Get historical stock market data. 'eastmoney_direct' support all A,B,H shares"""
+    """获取股票历史行情数据. 'eastmoney_direct' 支持所有 A, B, H 股"""
     df = ako.get_hist_data(
         symbol=symbol,
         interval=interval,
@@ -152,96 +151,96 @@ def get_hist_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取实时行情数据", description="获取股票的实时行情数据，支持多种数据源")
 def get_realtime_data(
     symbol: Annotated[
-        str | None, Field(description="Stock symbol/ticker (e.g. '000001')")
+        str | None, Field(description="股票代码 (例如: '000001')")
     ] = None,
     source: Annotated[
         Literal["xueqiu", "eastmoney", "eastmoney_direct"],
-        Field(description="Data source"),
+        Field(description="数据来源: xueqiu, eastmoney, eastmoney_direct。默认为：eastmoney_direct"),
     ] = "eastmoney_direct",
 ) -> str:
-    """Get real-time stock market data. 'eastmoney_direct' support all A,B,H shares"""
+    """获取实时股票行情数据. 'eastmoney_direct' 支持所有 A, B, H 股"""
     df = ako.get_realtime_data(symbol=symbol, source=source)
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取新闻数据", description="获取股票相关的新闻数据")
 def get_news_data(
-    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
-        int | None, Field(description="Number of most recent records to return", ge=1)
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
     ] = 10,
 ) -> str:
-    """Get stock-related news data."""
+    """获取股票相关新闻数据."""
     df = ako.get_news_data(symbol=symbol, source="eastmoney")
     if recent_n is not None:
         df = df.tail(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取资产负债表", description="获取公司的资产负债表数据")
 def get_balance_sheet(
-    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
-        int | None, Field(description="Number of most recent records to return", ge=1)
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
     ] = 10,
 ) -> str:
-    """Get company balance sheet data."""
+    """获取公司资产负债表数据."""
     df = ako.get_balance_sheet(symbol=symbol, source="sina")
     if recent_n is not None:
         df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取利润表", description="获取公司的利润表数据")
 def get_income_statement(
-    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
-        int | None, Field(description="Number of most recent records to return", ge=1)
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
     ] = 10,
 ) -> str:
-    """Get company income statement data."""
+    """获取公司利润表数据."""
     df = ako.get_income_statement(symbol=symbol, source="sina")
     if recent_n is not None:
         df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取现金流量表", description="获取公司的现金流量表数据")
 def get_cash_flow(
-    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
-    source: Annotated[Literal["sina"], Field(description="Data source")] = "sina",
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    source: Annotated[Literal["sina"], Field(description="数据来源")] = "sina",
     recent_n: Annotated[
-        int | None, Field(description="Number of most recent records to return", ge=1)
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
     ] = 10,
 ) -> str:
-    """Get company cash flow statement data."""
+    """获取公司现金流量表数据."""
     df = ako.get_cash_flow(symbol=symbol, source=source)
     if recent_n is not None:
         df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取内部交易数据", description="获取公司的内部交易数据")
 def get_inner_trade_data(
-    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
 ) -> str:
-    """Get company insider trading data."""
+    """获取公司内部交易数据."""
     df = ako.get_inner_trade_data(symbol, source="xueqiu")
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取财务指标", description="获取三大财务报表的关键财务指标")
 def get_financial_metrics(
-    symbol: Annotated[str, Field(description="Stock symbol/ticker (e.g. '000001')")],
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
-        int | None, Field(description="Number of most recent records to return", ge=1)
+        int | None, Field(description="返回最近N条记录的数量", ge=1)
     ] = 10,
 ) -> str:
     """
-    Get key financial metrics from the three major financial statements.
+    获取三大财务报表的关键财务指标.
     """
     df = ako.get_financial_metrics(symbol)
     if recent_n is not None:
@@ -249,20 +248,20 @@ def get_financial_metrics(
     return df.to_json(orient="records")
 
 
-@mcp.tool
+@mcp.tool(name="获取时间信息", description="获取当前时间（ISO格式、时间戳）和最近一个交易日")
 def get_time_info() -> dict:
-    """Get current time with ISO format, timestamp, and the last trading day."""
+    """获取当前时间（ISO格式、时间戳）和最近一个交易日."""
     local_time = datetime.now().astimezone()
     current_date = local_time.date()
 
-    # Get trading calendar
+    # 获取交易日历数据
     trade_date_df = ak.tool_trade_date_hist_sina()
-    trade_dates = [d for d in trade_date_df["trade_date"]]
+    trade_dates = [d for d in trade_date_df["trade_date"]] # 提取所有交易日期
 
-    # Filter dates <= current date and sort descending
+    # 筛选出小于等于当前日期的交易日，并按降序排列
     past_dates = sorted([d for d in trade_dates if d <= current_date], reverse=True)
 
-    # Find the most recent trading day
+    # 找到最近的一个交易日
     last_trading_day = past_dates[0].strftime("%Y-%m-%d") if past_dates else None
 
     return {
