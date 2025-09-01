@@ -14,11 +14,11 @@ dependencies = [
 keywords = ["akshare", "stock", "mcp", "mcp-server"]
 
 [project.urls]
-Homepage = "https://github.com/xinkuang/akshare-one-mcp"
-Repository = "https://github.com/xinkuang/akshare-one-mcp.git"
+Homepage = "https://github.com/xinkuang/china-stock-mcp"
+Repository = "https://github.com/xinkuang/china-stock-mcp.git"
 
 [project.scripts]
-china-stock-mcp = "akshare_one_mcp.__main__:main"
+china-stock-mcp = "china-stock-mcp.__main__:main"
 
 [build-system]
 requires = ["uv_build"]

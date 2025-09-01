@@ -139,7 +139,7 @@ docker run -p 8081:8081 ghcr.io/zwldarren/akshare-one-mcp:latest
 
 #### 2. 克隆仓库
 ```bash
-git clone https://github.com/xinkuang/akshare-one-mcp
+git clone https://github.com/xinkuang/china-stock-mcp
 cd akshare-one-mcp
 ```
 
@@ -273,8 +273,8 @@ akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
 
 1. 克隆仓库
 ```bash
-git clone https://github.com/xinkuang/akshare-one-mcp
-cd akshare-one-mcp
+git clone https://github.com/xinkuang/china-stock-mcp
+cd china-stock-mcp
 ```
 
 2. 安装开发依赖
