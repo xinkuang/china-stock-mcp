@@ -277,8 +277,8 @@ def get_stock_basic_info(
     ] = "A股",
     data_source: Annotated[
         Literal["eastmoney", "xueqiu", "cninfo", "xq"],
-        Field(description="数据来源: eastmoney(东方财富), xueqiu(雪球), cninfo(巨潮资讯), xq(雪球)。默认: eastmoney"),
-    ] = "eastmoney",
+        Field(description="数据来源: eastmoney(东方财富), xueqiu(雪球), cninfo(巨潮资讯), xq(雪球)。默认: cninfo"),
+    ] = "cninfo",
     recent_n: Annotated[
         int | None, Field(description="返回最近N条记录的数量，仅适用于部分接口", ge=1)
     ] = None,
@@ -318,19 +318,19 @@ def get_stock_basic_info(
 @mcp.tool(name="获取宏观经济数据", description="获取宏观经济数据")
 def get_macro_data(
     indicator: Annotated[
-        str,
+        Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"],
         Field(
             description="宏观经济指标，可选值包括: money_supply(货币供应量), gdp(GDP数据), cpi(CPI数据), pmi(PMI数据), stock_summary(股市概览)等",
             examples=["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
         )
     ],
     data_source: Annotated[
-        Literal["sina", "eastmoney", "cnstats"],
-        Field(description="数据来源: sina, eastmoney, cnstats。默认: sina"),
+        Literal["sina", "eastmoney"],
+        Field(description="数据来源: sina, eastmoney。默认: sina"),
     ] = "sina",
     recent_n: Annotated[
         int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
+    ] = 100,
 ) -> str:
     """获取宏观经济数据"""
     try:
@@ -373,12 +373,12 @@ def get_macro_data(
 def get_investor_sentiment(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     indicator: Annotated[
-        Literal["retail_attention", "retail_bullish", "northbound_flow", "institution_research"],
-        Field(description="情绪指标: retail_attention(散户关注), retail_bullish(散户看涨), northbound_flow(北向资金), institution_research(机构调研)。默认: retail_attention"),
-    ] = "retail_attention",
+        Literal["retail_attention", "retail_bullish", "northbound_flow", "institution_research", "institution_participate"],
+        Field(description="情绪指标: retail_attention(散户关注), retail_bullish(散户看涨), northbound_flow(北向资金), institution_research(机构调研),institution_participate(机构关注)。默认: institution_participate"),
+    ] = "institution_participate",
     data_source: Annotated[
-        Literal["eastmoney", "xueqiu"],
-        Field(description="数据来源: eastmoney, xueqiu。默认: eastmoney"),
+        Literal["eastmoney"],
+        Field(description="数据来源: eastmoney。默认: eastmoney"),
     ] = "eastmoney",
     recent_n: Annotated[
         int | None, Field(description="返回最近N条记录的数量", ge=1)
@@ -388,13 +388,11 @@ def get_investor_sentiment(
     try:
         if indicator == "retail_attention":
             if data_source == "eastmoney":
-                df = ak.stock_comment_detail_scrd_attention_em(symbol)
+                df = ak.stock_comment_detail_scrd_focus_em(symbol)
             else:
                 raise ValueError(f"Unsupported data_source for retail_attention: {data_source}")
         elif indicator == "retail_bullish":
-            if data_source == "eastmoney":
-                df = ak.stock_comment_detail_scrd_bullish_em(symbol)
-            elif data_source == "xueqiu":
+            if data_source == "eastmoney":      
                 df = ak.stock_comment_detail_scrd_desire_daily_em(symbol)
             else:
                 raise ValueError(f"Unsupported data_source for retail_bullish: {data_source}")
@@ -408,6 +406,11 @@ def get_investor_sentiment(
                 df = ak.stock_institute_recommend_detail(symbol)
             else:
                 raise ValueError(f"Unsupported data_source for institution_research: {data_source}")
+        elif indicator == "institution_participate":
+            if data_source == "eastmoney":
+                df = ak.stock_comment_detail_zlkp_jgcyd_em(symbol)
+            else:
+                raise ValueError(f"Unsupported data_source for institution_participate: {data_source}")
         else:
             raise ValueError(f"Unsupported indicator: {indicator}")
 
@@ -424,12 +427,12 @@ def get_investor_sentiment(
 def get_shareholder_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     shareholder_type: Annotated[
-        Literal["top_circulating", "top_holders", "shareholder_count", "pledge_ratio"],
-        Field(description="股东类型: top_circulating(十大流通股东), top_holders(十大股东), shareholder_count(股东户数), pledge_ratio(股权质押)。默认: top_circulating"),
-    ] = "top_circulating",
+        Literal["shareholder_count"],
+        Field(description="股东类型: shareholder_count(股东户数)。默认: shareholder_count"),
+    ] = "shareholder_count",
     data_source: Annotated[
-        Literal["eastmoney", "cninfo"],
-        Field(description="数据来源: eastmoney, cninfo。默认: eastmoney"),
+        Literal["eastmoney"],
+        Field(description="数据来源: eastmoney。默认: eastmoney"),
     ] = "eastmoney",
     recent_n: Annotated[
         int | None, Field(description="返回最近N条记录的数量", ge=1)
@@ -437,28 +440,12 @@ def get_shareholder_info(
 ) -> str:
     """获取股东情况"""
     try:
-        if shareholder_type == "top_circulating":
+        if shareholder_type == "shareholder_count":
             if data_source == "eastmoney":
-                df = ak.stock_ggcg_em(symbol)
-            elif data_source == "cninfo":
-                df = ak.stock_gpzy_profile_em(symbol)
+                df = ak.stock_zh_a_gdhs_detail_em(symbol)  
+                print(df)         
             else:
-                raise ValueError(f"Unsupported data_source for top_circulating: {data_source}")
-        elif shareholder_type == "top_holders":
-            if data_source == "eastmoney":
-                df = ak.stock_gpzy_distribute_statistics_company_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for top_holders: {data_source}")
-        elif shareholder_type == "shareholder_count":
-            if data_source == "cninfo":
-                df = ak.stock_gpzy_pledge_ratio_detail_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for shareholder_count: {data_source}")
-        elif shareholder_type == "pledge_ratio":
-            if data_source == "eastmoney":
-                df = ak.stock_gpzy_pledge_ratio_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for pledge_ratio: {data_source}")
+                raise ValueError(f"Unsupported data_source for top_circulating: {data_source}")       
         else:
             raise ValueError(f"Unsupported shareholder_type: {shareholder_type}")
 
@@ -475,12 +462,12 @@ def get_shareholder_info(
 def get_product_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     info_type: Annotated[
-        Literal["business_composition", "product_type", "industry_category"],
-        Field(description="信息类型: business_composition(主营构成), product_type(产品类型), industry_category(行业分类)。默认: business_composition"),
+        Literal["business_composition"],
+        Field(description="信息类型: business_composition(主营构成)。默认: business_composition"),
     ] = "business_composition",
     data_source: Annotated[
-        Literal["ths", "cninfo"],
-        Field(description="数据来源: ths(同花顺), cninfo(巨潮资讯)。默认: ths"),
+        Literal["ths", "eastmoney"],
+        Field(description="数据来源: ths(同花顺), eastmoney(东风财富网)。默认: ths"),
     ] = "ths",
     recent_n: Annotated[
         int | None, Field(description="返回最近N条记录的数量", ge=1)
@@ -491,24 +478,10 @@ def get_product_info(
         if info_type == "business_composition":
             if data_source == "ths":
                 df = ak.stock_zyjs_ths(symbol)
-            elif data_source == "cninfo":
+            elif data_source == "eastmoney":
                 df = ak.stock_zygc_em(symbol)
             else:
-                raise ValueError(f"Unsupported data_source for business_composition: {data_source}")
-        elif info_type == "product_type":
-            if data_source == "ths":
-                df = ak.stock_zyjs_ths(symbol)
-            elif data_source == "cninfo":
-                df = ak.stock_zygc_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for product_type: {data_source}")
-        elif info_type == "industry_category":
-            if data_source == "cninfo":
-                df = ak.stock_industry_category_cninfo(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for industry_category: {data_source}")
-        else:
-            raise ValueError(f"Unsupported info_type: {info_type}")
+                raise ValueError(f"Unsupported data_source for business_composition: {data_source}")       
 
         if recent_n is not None:
             df = df.tail(recent_n)

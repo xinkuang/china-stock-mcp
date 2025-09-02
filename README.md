@@ -231,7 +231,7 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
         "--directory",
         "/path/to/china_stock_mcp",
         "run",
-        "china_stock_mcp"
+        "china-stock-mcp"
       ]
     }
   }
@@ -275,7 +275,7 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-      "args": [ "china_stock_mcp"]
+      "args": [ "china-stock-mcp"]
     }
   }
 }
@@ -287,7 +287,7 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-    "args": [ "china_stock_mcp"]
+    "args": [ "china-stock-mcp"]
     }
   }
 }
@@ -377,4 +377,7 @@ A: 确认端口 8081 未被其他服务占用，且防火墙允许相应端口�
 
 **Q: 如何更新到最新版本？**
 A: 使用 Smithery 安装的可以自动更新，手动安装的请重新拉取仓库代码。
+## 🐞 调试
+
+有关如何使用 @modelcontextprotocol/inspector 调试此服务器的详细信息，请参阅 [DEBUG.md](DEBUG.md)。
 
