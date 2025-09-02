@@ -10,7 +10,7 @@ from pydantic import Field
 
 mcp = FastMCP(name="china-stock-mcp") # 初始化 FastMCP 服务器实例
 
-@mcp.tool(name="获取历史行情数据", description="获取股票的历史行情数据，支持多种数据源和技术指标")
+@mcp.tool(name="get_hist_data", description="获取股票的历史行情数据，支持多种数据源和技术指标")
 def get_hist_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     interval: Annotated[
@@ -151,7 +151,7 @@ def get_hist_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取实时行情数据", description="获取股票的实时行情数据，支持多种数据源")
+@mcp.tool(name="get_realtime_data", description="获取股票的实时行情数据，支持多种数据源")
 def get_realtime_data(
     symbol: Annotated[
         str | None, Field(description="股票代码 (例如: '000001')")
@@ -166,7 +166,7 @@ def get_realtime_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取新闻数据", description="获取股票相关的新闻数据")
+@mcp.tool(name="get_news_data", description="获取股票相关的新闻数据")
 def get_news_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
@@ -180,7 +180,7 @@ def get_news_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取资产负债表", description="获取公司的资产负债表数据")
+@mcp.tool(name="get_balance_sheet", description="获取公司的资产负债表数据")
 def get_balance_sheet(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
@@ -194,7 +194,7 @@ def get_balance_sheet(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取利润表", description="获取公司的利润表数据")
+@mcp.tool(name="get_income_statement", description="获取公司的利润表数据")
 def get_income_statement(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
@@ -208,7 +208,7 @@ def get_income_statement(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取现金流量表", description="获取公司的现金流量表数据")
+@mcp.tool(name="get_cash_flow", description="获取公司的现金流量表数据")
 def get_cash_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     source: Annotated[Literal["sina"], Field(description="数据来源")] = "sina",
@@ -223,7 +223,7 @@ def get_cash_flow(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取内部交易数据", description="获取公司的内部交易数据")
+@mcp.tool(name="get_inner_trade_data", description="获取公司的内部交易数据")
 def get_inner_trade_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
 ) -> str:
@@ -232,7 +232,7 @@ def get_inner_trade_data(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取财务指标", description="获取三大财务报表的关键财务指标")
+@mcp.tool(name="get_financial_metrics", description="获取三大财务报表的关键财务指标")
 def get_financial_metrics(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     recent_n: Annotated[
@@ -248,7 +248,7 @@ def get_financial_metrics(
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="获取时间信息", description="获取当前时间（ISO格式、时间戳）和最近一个交易日")
+@mcp.tool(name="get_time_info", description="获取当前时间（ISO格式、时间戳）和最近一个交易日")
 def get_time_info() -> dict:
     """获取当前时间（ISO格式、时间戳）和最近一个交易日."""
     local_time = datetime.now().astimezone()
@@ -269,7 +269,7 @@ def get_time_info() -> dict:
         "timestamp": local_time.timestamp(),
         "last_trading_day": last_trading_day,
     }
-@mcp.tool(name="获取股票基本概要信息", description="获取指定股票的基本概要信息，支持 A 股和港股")
+@mcp.tool(name="get_stock_basic_info", description="获取指定股票的基本概要信息")
 def get_stock_basic_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001' 代表A股, '00700' 代表港股)")],
     market_type: Annotated[
@@ -315,7 +315,7 @@ def get_stock_basic_info(
         return f"Error fetching stock basic info: {str(e)}"
 
 
-@mcp.tool(name="获取宏观经济数据", description="获取宏观经济数据")
+@mcp.tool(name="get_macro_data", description="获取宏观经济数据")
 def get_macro_data(
     indicator: Annotated[
         Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"],
@@ -369,7 +369,7 @@ def get_macro_data(
         return f"Error fetching macro data: {str(e)}"
 
 
-@mcp.tool(name="分析散户和机构投资者投资情绪", description="分析散户和机构投资者的投资情绪")
+@mcp.tool(name="get_investor_sentiment", description="分析散户和机构投资者的投资情绪")
 def get_investor_sentiment(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     indicator: Annotated[
@@ -423,7 +423,7 @@ def get_investor_sentiment(
         return f"Error fetching investor sentiment data: {str(e)}"
 
 
-@mcp.tool(name="获取股东情况", description="获取指定股票的股东情况")
+@mcp.tool(name="get_shareholder_info", description="获取指定股票的股东情况")
 def get_shareholder_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     shareholder_type: Annotated[
@@ -458,7 +458,7 @@ def get_shareholder_info(
         return f"Error fetching shareholder info: {str(e)}"
 
 
-@mcp.tool(name="获取产品情况", description="获取指定股票公司的主要产品或业务构成")
+@mcp.tool(name="get_product_info", description="获取指定股票公司的主要产品或业务构成")
 def get_product_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     info_type: Annotated[

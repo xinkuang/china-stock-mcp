@@ -109,7 +109,7 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 获取当前时间的ISO格式、时间戳和最近的交易日。
 ### 10. `获取股票基本概要信息` (get_stock_basic_info)
 
-获取指定股票的基本概要信息，支持 A 股和港股。
+获取指定股票的基本概要信息。
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001' 代表A股, '00700' 代表港股
@@ -123,7 +123,7 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `indicator` (string): 宏观经济指标 ('money_supply', 'gdp', 'cpi', 'pmi', 'stock_summary')
-- `data_source` (string): 数据来源 ('sina', 'eastmoney', 'cnstats')，默认为 'sina'
+- `data_source` (string): 数据来源 ('sina', 'eastmoney')，默认为 'sina'
 - `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 12. `分析散户和机构投资者投资情绪` (get_investor_sentiment)
@@ -132,8 +132,8 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001'
-- `indicator` (string): 情绪指标 ('retail_attention', 'retail_bullish', 'northbound_flow', 'institution_research')，默认为 'retail_attention'
-- `data_source` (string): 数据来源 ('eastmoney', 'xueqiu')，默认为 'eastmoney'
+- `indicator` (string): 情绪指标 ('retail_attention', 'retail_bullish', 'northbound_flow', 'institution_research', 'institution_participate')，默认为 'institution_participate'
+- `data_source` (string): 数据来源 ('eastmoney')，默认为 'eastmoney'
 - `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 13. `获取股东情况` (get_shareholder_info)
@@ -142,8 +142,8 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001'
-- `shareholder_type` (string): 股东类型 ('top_circulating', 'top_holders', 'shareholder_count', 'pledge_ratio')，默认为 'top_circulating'
-- `data_source` (string): 数据来源 ('eastmoney', 'cninfo')，默认为 'eastmoney'
+- `shareholder_type` (string): 股东类型 ('shareholder_count')，默认为 'shareholder_count'
+- `data_source` (string): 数据来源 ('eastmoney')，默认为 'eastmoney'
 - `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 14. `获取产品情况` (get_product_info)
@@ -152,8 +152,8 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001'
-- `info_type` (string): 信息类型 ('business_composition', 'product_type', 'industry_category')，默认为 'business_composition'
-- `data_source` (string): 数据来源 ('ths', 'cninfo')，默认为 'ths'
+- `info_type` (string): 信息类型 ('business_composition')，默认为 'business_composition'
+- `data_source` (string): 数据来源 ('ths', 'eastmoney')，默认为 'ths'
 - `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 
