@@ -206,8 +206,6 @@ pip install -r requirements.txt
 **stdio 模式 (默认，适用于本地 MCP 客户端):**
 ```bash
 uv run -m china_stock_mcp
-# 或
-python -m china-stock-mcp
 ```
 
 **HTTP 模式 (适用于远程访问):**
@@ -227,13 +225,13 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china-stock-mcp": {
+    "china_stock_mcp": {
       "command": "uv",
       "args": [
         "--directory",
-        "/path/to/china-stock-mcp",
+        "/path/to/china_stock_mcp",
         "run",
-        "china-stock-mcp"
+        "china_stock_mcp"
       ]
     }
   }
@@ -244,11 +242,11 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
     "mcpServers": {
-        "china-stock-mcp": {
+        "china_stock_mcp": {
             "command": "uvx",
             "args": [
                 "--from",
-                "china-stock-mcp",
+                "china_stock_mcp",
                 "china_stock_mcp"
             ]
         }
@@ -260,9 +258,9 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china-stock-mcp": {
+    "china_stock_mcp": {
       "command": "uvx",
-      "args": ["china-stock-mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"],
+      "args": ["china_stock_mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"],
       "env": {
         "MCP_BASE_URL": "http://localhost:8081/mcp"
       }
@@ -277,10 +275,10 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china-stock-mcp": {
+    "china_stock_mcp": {
       "command": "uvx",
       "args": [ "--from",
-                "china-stock-mcp",
+                "china_stock_mcp",
                 "china_stock_mcp"]
     }
   }
@@ -291,10 +289,10 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china-stock-mcp": {
+    "china_stock_mcp": {
       "command": "uvx",
       "args": [ "--from",
-                "china-stock-mcp",
+                "china_stock_mcp",
                 "china_stock_mcp"]
     }
   }
@@ -347,7 +345,7 @@ uv run -m china_stock_mcp
 ### 代码结构
 
 ```
-src/akshare_one_mcp/
+src/china_stock_mcp/
 ├── __init__.py
 ├── __main__.py    # 命令行入口，处理启动参数
 ├── server.py      # MCP 服务器核心，定义所有工具
