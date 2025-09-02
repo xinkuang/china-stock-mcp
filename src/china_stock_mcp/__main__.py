@@ -5,7 +5,7 @@ import uvicorn # 用于 ASGI 服务器
 from starlette.middleware.cors import CORSMiddleware # 用于处理跨域资源共享 (CORS)
 
 
-from server import mcp
+from .server import mcp
 
 
 # 初始化日志记录器

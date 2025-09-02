@@ -15,4 +15,4 @@ RUN pip install --upgrade pip setuptools build wheel \
 EXPOSE 8081
 
 # Default command to start MCP over HTTP
-CMD ["china-stock-mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"]
+CMD ["python", "-m", "china_stock_mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"]

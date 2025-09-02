@@ -333,7 +333,7 @@ uv sync --dev
 
 3. 进入开发模式
 ```bash
-uv run china-stock-mcp
+uv run -m china_stock_mcp
 ```
 
 ### 代码结构

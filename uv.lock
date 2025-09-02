@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.12"
 
 [[package]]
@@ -123,23 +123,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/cd/3c/55b50072ea72e85a9f78dcc9fd52c1c1503f7be2b1ab1aa683513ed3721d/akshare_one-0.3.10.tar.gz", hash = "sha256:b1cebd2ae20265185a9b12c16385a27e5a5853d8e399435d7e3d555d60d3a274", size = 24244, upload-time = "2025-08-25T18:45:05.833Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/17/95c5e473c08ae63c2baf87541f2cb868cad10272cfd561e822d58c2d8101/akshare_one-0.3.10-py3-none-any.whl", hash = "sha256:23ff9f44d3686a83c18e19417e5223bc9104f64a25edb453ea15d0dc19c6b83c", size = 40623, upload-time = "2025-08-25T18:45:04.813Z" },
-]
-
-[[package]]
-name = "akshare-one-mcp"
-version = "0.3.3"
-source = { editable = "." }
-dependencies = [
-    { name = "akshare-one" },
-    { name = "fastmcp" },
-    { name = "uvicorn" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "akshare-one", specifier = ">=0.3.10" },
-    { name = "fastmcp", specifier = ">=2.11.3" },
-    { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 
 [[package]]
@@ -290,6 +273,23 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/8c/9839225320046ed279c6e839d51f028342eb77c91c89b8ef2549f951f3ec/charset_normalizer-3.4.3-cp314-cp314-win32.whl", hash = "sha256:c6dbd0ccdda3a2ba7c2ecd9d77b37f3b5831687d8dc1b6ca5f56a4880cc7b7ce", size = 100086, upload-time = "2025-08-09T07:56:52.722Z" },
     { url = "https://files.pythonhosted.org/packages/ee/7a/36fbcf646e41f710ce0a563c1c9a343c6edf9be80786edeb15b6f62e17db/charset_normalizer-3.4.3-cp314-cp314-win_amd64.whl", hash = "sha256:73dc19b562516fc9bcf6e5d6e596df0b4eb98d87e4f79f3ae71840e6ed21361c", size = 107400, upload-time = "2025-08-09T07:56:55.172Z" },
     { url = "https://files.pythonhosted.org/packages/8a/1f/f041989e93b001bc4e44bb1669ccdcf54d3f00e628229a85b08d330615c5/charset_normalizer-3.4.3-py3-none-any.whl", hash = "sha256:ce571ab16d890d23b5c278547ba694193a45011ff86a9162a71307ed9f86759a", size = 53175, upload-time = "2025-08-09T07:57:26.864Z" },
+]
+
+[[package]]
+name = "china-stock-mcp"
+version = "0.1.1"
+source = { editable = "." }
+dependencies = [
+    { name = "akshare-one" },
+    { name = "fastmcp" },
+    { name = "uvicorn" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "akshare-one", specifier = ">=0.3.10" },
+    { name = "fastmcp", specifier = ">=2.11.3" },
+    { name = "uvicorn", specifier = ">=0.35.0" },
 ]
 
 [[package]]
