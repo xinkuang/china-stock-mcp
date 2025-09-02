@@ -205,14 +205,14 @@ pip install -r requirements.txt
 
 **stdio 模式 (默认，适用于本地 MCP 客户端):**
 ```bash
-china-stock-mcp
+uv run -m china_stock_mcp
 # 或
 python -m china-stock-mcp
 ```
 
 **HTTP 模式 (适用于远程访问):**
 ```bash
-china-stock-mcp --streamable-http --host 0.0.0.0 --port 8081
+uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```
 
 服务器将在 `http://localhost:8081/mcp` 提供服务。
@@ -243,12 +243,16 @@ china-stock-mcp --streamable-http --host 0.0.0.0 --port 8081
 **方式二: 通过 uvx**
 ```json
 {
-  "mcpServers": {
-    "china-stock-mcp": {
-      "command": "uvx",
-      "args": ["china-stock-mcp"]
+    "mcpServers": {
+        "china-stock-mcp": {
+            "command": "uvx",
+            "args": [
+                "--from",
+                "china-stock-mcp",
+                "china_stock_mcp"
+            ]
+        }
     }
-  }
 }
 ```
 
@@ -275,7 +279,9 @@ china-stock-mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-      "args": ["china-stock-mcp"]
+      "args": [ "--from",
+                "china-stock-mcp",
+                "china_stock_mcp"]
     }
   }
 }
@@ -287,7 +293,9 @@ china-stock-mcp --streamable-http --host 0.0.0.0 --port 8081
   "mcpServers": {
     "china-stock-mcp": {
       "command": "uvx",
-      "args": ["china-stock-mcp"]
+      "args": [ "--from",
+                "china-stock-mcp",
+                "china_stock_mcp"]
     }
   }
 }
