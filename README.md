@@ -161,22 +161,22 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 ### 方法一: 使用 Smithery（推荐）
 
-通过 [Smithery](https://smithery.ai/server/@zwldarren/akshare-one-mcp) 自动安装到 Claude Desktop：
+通过 [Smithery](https://smithery.ai/server/@xinkuang/china-stock-mcp) 自动安装到 Claude Desktop：
 
 ```bash
-npx -y @smithery/cli install @zwldarren/akshare-one-mcp --client claude
+npx -y @smithery/cli install @xinkuang/china-stock-mcp --client claude
 ```
 
 ### 方法二: 使用 Docker
 
 #### 1. 拉取镜像
 ```bash
-docker pull ghcr.io/zwldarren/akshare-one-mcp:latest
+docker pull ghcr.io/xinkuang/china-stock-mcp:latest
 ```
 
 #### 2. 运行容器
 ```bash
-docker run -p 8081:8081 ghcr.io/zwldarren/akshare-one-mcp:latest
+docker run -p 8081:8081 ghcr.io/xinkuang/china-stock-mcp:latest
 ```
 
 ### 方法三: 本地源代码安装
@@ -212,7 +212,7 @@ python -m china-stock-mcp
 
 **HTTP 模式 (适用于远程访问):**
 ```bash
-akshare-one-mcp --streamable-http --host 0.0.0.0 --port 8081
+china-stock-mcp --streamable-http --host 0.0.0.0 --port 8081
 ```
 
 服务器将在 `http://localhost:8081/mcp` 提供服务。
