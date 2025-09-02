@@ -225,7 +225,7 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china_stock_mcp": {
+    "china-stock-mcp": {
       "command": "uv",
       "args": [
         "--directory",
@@ -242,12 +242,10 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
     "mcpServers": {
-        "china_stock_mcp": {
+        "china-stock-mcp": {
             "command": "uvx",
             "args": [
-                "--from",
-                "china_stock_mcp",
-                "china_stock_mcp"
+              "china-stock-mcp"
             ]
         }
     }
@@ -258,9 +256,9 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china_stock_mcp": {
+    "china-stock-mcp": {
       "command": "uvx",
-      "args": ["china_stock_mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"],
+      "args": ["china-stock-mcp", "--streamable-http", "--host", "0.0.0.0", "--port", "8081"],
       "env": {
         "MCP_BASE_URL": "http://localhost:8081/mcp"
       }
@@ -275,11 +273,9 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china_stock_mcp": {
+    "china-stock-mcp": {
       "command": "uvx",
-      "args": [ "--from",
-                "china_stock_mcp",
-                "china_stock_mcp"]
+      "args": [ "china_stock_mcp"]
     }
   }
 }
@@ -289,11 +285,9 @@ uv run -m china_stock_mcp --streamable-http --host 0.0.0.0 --port 8081
 ```json
 {
   "mcpServers": {
-    "china_stock_mcp": {
+    "china-stock-mcp": {
       "command": "uvx",
-      "args": [ "--from",
-                "china_stock_mcp",
-                "china_stock_mcp"]
+    "args": [ "china_stock_mcp"]
     }
   }
 }
