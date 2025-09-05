@@ -25,6 +25,8 @@
 
 ### 支持的数据源
 
+- **数据源故障切换**: 内置 `_fetch_data_with_fallback` 机制，支持按优先级自动切换数据源，提高数据获取的稳定性和可靠性。
+
 - 东方财富 (eastmoney, eastmoney_direct)
 - 新浪财经 (sina)
 - 雪球 (xueqiu)
@@ -41,9 +43,8 @@
 - `start_date` (string): 开始日期，格式为 'YYYY-MM-DD'，默认为 '1970-01-01'
 - `end_date` (string): 结束日期，格式为 'YYYY-MM-DD'，默认为 '2030-12-31'
 - `adjust` (string): 复权类型 ('none', 'qfq', 'hfq')，默认为 'none'
-- `source` (string): 数据源 ('eastmoney', 'eastmoney_direct', 'sina')，默认为 'eastmoney'
 - `indicators_list` (list): 要添加的技术指标列表
-- `recent_n` (number): 返回最近 N 条记录的数量，默认为 100
+
 
 **支持的技术指标** (共 30+ 种):
 SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC
@@ -54,7 +55,6 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string, 可选): 股票代码
-- `source` (string, 可选): 数据源 ('xueqiu', 'eastmoney', 'eastmoney_direct')，默认为 'eastmoney_direct'
 
 ### 3. `获取新闻数据` (get_news_data)
 
@@ -62,7 +62,6 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 4. `获取资产负债表` (get_balance_sheet)
 
@@ -70,7 +69,6 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 5. `获取利润表` (get_income_statement)
 
@@ -78,7 +76,6 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 6. `获取现金流量表` (get_cash_flow)
 
@@ -86,8 +83,6 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码
-- `source` (string, 可选): 数据源，默认为 'sina'
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 7. `获取内部交易数据` (get_inner_trade_data)
 
@@ -102,7 +97,6 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 9. `获取时间信息` (get_time_info)
 
@@ -113,18 +107,10 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001' 代表A股, '00700' 代表港股
-- `market_type` (string): 市场类型 ('A股', '港股')，默认为 'A股'
-- `data_source` (string): 数据来源 ('eastmoney', 'xueqiu', 'cninfo', 'xq')，默认为 'eastmoney'
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，仅适用于部分接口，默认为 None
 
 ### 11. `获取宏观经济数据` (get_macro_data)
 
 获取宏观经济数据，包括货币供应量、GDP、CPI、PMI等指标。
-
-**参数:**
-- `indicator` (string): 宏观经济指标 ('money_supply', 'gdp', 'cpi', 'pmi', 'stock_summary')
-- `data_source` (string): 数据来源 ('sina', 'eastmoney')，默认为 'sina'
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
 
 ### 12. `分析散户和机构投资者投资情绪` (get_investor_sentiment)
 
@@ -132,9 +118,7 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001'
-- `indicator` (string): 情绪指标 ('retail_attention', 'retail_bullish', 'northbound_flow', 'institution_research', 'institution_participate')，默认为 'institution_participate'
-- `data_source` (string): 数据来源 ('eastmoney')，默认为 'eastmoney'
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
+
 
 ### 13. `获取股东情况` (get_shareholder_info)
 
@@ -142,9 +126,7 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001'
-- `shareholder_type` (string): 股东类型 ('shareholder_count')，默认为 'shareholder_count'
-- `data_source` (string): 数据来源 ('eastmoney')，默认为 'eastmoney'
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
+
 
 ### 14. `获取产品情况` (get_product_info)
 
@@ -152,9 +134,7 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 **参数:**
 - `symbol` (string): 股票代码，如 '000001'
-- `info_type` (string): 信息类型 ('business_composition')，默认为 'business_composition'
-- `data_source` (string): 数据来源 ('ths', 'eastmoney')，默认为 'ths'
-- `recent_n` (number, 可选): 返回最近 N 条记录的数量，默认为 10
+
 
 
 ## 🚀 安装和运行
@@ -380,4 +360,3 @@ A: 使用 Smithery 安装的可以自动更新，手动安装的请重新拉取�
 ## 🐞 调试
 
 有关如何使用 @modelcontextprotocol/inspector 调试此服务器的详细信息，请参阅 [DEBUG.md](DEBUG.md)。
-

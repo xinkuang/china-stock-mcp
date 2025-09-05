@@ -1,25 +1,84 @@
 from datetime import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Callable, Any, List
 
 import akshare as ak
 import akshare_one as ako
+import pandas as pd
 from akshare_one import indicators
 from fastmcp import FastMCP
 from pydantic import Field
 
 
-mcp = FastMCP(name="china-stock-mcp") # 初始化 FastMCP 服务器实例
+def _fetch_data_with_fallback(
+    fetch_func: Callable[..., pd.DataFrame],
+    primary_source: str,
+    fallback_sources: List[str],
+    **kwargs: Any,
+) -> pd.DataFrame:
+    """
+    通用的数据源故障切换辅助函数。
+    按优先级尝试数据源，直到获取到有效数据或所有数据源都失败。
 
-@mcp.tool(name="get_hist_data", description="获取股票的历史行情数据，支持多种数据源和技术指标")
+    Args:
+        fetch_func: 实际调用 akshare 或 akshare_one 获取数据的函数。
+                    这个函数应该接受 'source' 参数，或者在内部处理 source 的映射。
+        primary_source: 用户指定的首选数据源。
+        fallback_sources: 备用数据源列表，按优先级排序。
+        **kwargs: 传递给 fetch_func 的其他参数。
+
+    Returns:
+        pd.DataFrame: 获取到的数据。
+
+    Raises:
+        RuntimeError: 如果所有数据源都未能获取到有效数据。
+    """
+    data_source_priority = [primary_source] + fallback_sources
+    # 移除重复项并保持顺序
+    seen = set()
+    unique_data_source_priority = []
+    for x in data_source_priority:
+        if x not in seen:
+            unique_data_source_priority.append(x)
+            seen.add(x)
+
+    df = None
+    errors = []
+
+    for current_source in unique_data_source_priority:
+        try:
+            # 假设 fetch_func 能够接受 source 参数
+            # 或者 fetch_func 内部根据 kwargs 中的 source 参数进行逻辑判断
+            temp_df = fetch_func(source=current_source, **kwargs)
+            if temp_df is not None and not temp_df.empty:
+                print(f"成功从数据源 '{current_source}' 获取数据。")
+                df = temp_df
+                break
+            else:
+                errors.append(f"数据源 '{current_source}' 返回空数据。")
+        except Exception as e:
+            errors.append(f"从数据源 '{current_source}' 获取数据失败: {str(e)}")
+
+    if df is None or df.empty:
+        raise RuntimeError(
+            f"所有数据源都未能获取到有效数据。详细错误: {'; '.join(errors)}"
+        )
+
+    return df
+
+
+mcp = FastMCP(name="china-stock-mcp")  # 初始化 FastMCP 服务器实例
+
+
+@mcp.tool(
+    name="get_hist_data", description="获取股票的历史行情数据，支持多种数据源和技术指标"
+)
 def get_hist_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     interval: Annotated[
         Literal["minute", "hour", "day", "week", "month", "year"],
         Field(description="时间周期: minute, hour, day, week, month, year。默认:day"),
     ] = "day",
-    interval_multiplier: Annotated[
-        int, Field(description="时间周期乘数", ge=1)
-    ] = 1,
+    interval_multiplier: Annotated[int, Field(description="时间周期乘数", ge=1)] = 1,
     start_date: Annotated[
         str, Field(description="开始日期，格式为 YYYY-MM-DD")
     ] = "1970-01-01",
@@ -27,12 +86,9 @@ def get_hist_data(
         str, Field(description="结束日期，格式为 YYYY-MM-DD")
     ] = "2030-12-31",
     adjust: Annotated[
-        Literal["none", "qfq", "hfq"], Field(description="复权类型: none, qfq(前复权), hfq(后复权)。默认：none")
+        Literal["none", "qfq", "hfq"],
+        Field(description="复权类型: none, qfq(前复权), hfq(后复权)。默认：none"),
     ] = "none",
-    source: Annotated[
-        Literal["eastmoney", "eastmoney_direct", "sina"],
-        Field(description="数据来源: xueqiu, eastmoney, eastmoney_direct。默认：eastmoney"),
-    ] = "eastmoney",
     indicators_list: Annotated[
         list[
             Literal[
@@ -73,22 +129,64 @@ def get_hist_data(
             ]
         ]
         | None,
-        Field(description="要添加的技术指标: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC"),
-    ] = None,
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 100,
+        Field(
+            description="要添加的技术指标: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC"
+        ),
+    ] = [
+        "SMA",
+        "EMA",
+        "RSI",
+        "MACD",
+        "BOLL",
+        "STOCH",
+        "ATR",
+        "CCI",
+        "ADX",
+        "WILLR",
+        "AD",
+        "ADOSC",
+        "OBV",
+        "MOM",
+        "SAR",
+        "TSF",
+        "APO",
+        "AROON",
+        "AROONOSC",
+        "BOP",
+        "CMO",
+        "DX",
+        "MFI",
+        "MINUS_DI",
+        "MINUS_DM",
+        "PLUS_DI",
+        "PLUS_DM",
+        "PPO",
+        "ROC",
+        "ROCP",
+        "ROCR",
+        "ROCR100",
+        "TRIX",
+        "ULTOSC",
+    ],
 ) -> str:
     """获取股票历史行情数据. 'eastmoney_direct' 支持所有 A, B, H 股"""
-    df = ako.get_hist_data(
+
+    # 定义内部 fetch_func
+    def hist_data_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        return ako.get_hist_data(source=source, **kwargs)
+
+    df = _fetch_data_with_fallback(
+        fetch_func=hist_data_fetcher,
+        primary_source="eastmoney",
+        fallback_sources=["eastmoney_direct", "sina"],
         symbol=symbol,
         interval=interval,
         interval_multiplier=interval_multiplier,
         start_date=start_date,
         end_date=end_date,
         adjust=adjust,
-        source=source,
     )
+
     if indicators_list:
         indicator_map = {
             "SMA": (indicators.get_sma, {"window": 20}),
@@ -146,80 +244,65 @@ def get_hist_data(
                 temp.append(indicator_df)
         if temp:
             df = df.join(temp)
-    if recent_n is not None:
-        df = df.tail(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="get_realtime_data", description="获取股票的实时行情数据，支持多种数据源")
+@mcp.tool(
+    name="get_realtime_data", description="获取股票的实时行情数据，支持多种数据源"
+)
 def get_realtime_data(
     symbol: Annotated[
         str | None, Field(description="股票代码 (例如: '000001')")
     ] = None,
-    source: Annotated[
-        Literal["xueqiu", "eastmoney", "eastmoney_direct"],
-        Field(description="数据来源: xueqiu, eastmoney, eastmoney_direct。默认为：eastmoney_direct"),
-    ] = "eastmoney_direct",
 ) -> str:
-    """获取实时股票行情数据. 'eastmoney_direct' 支持所有 A, B, H 股"""
-    df = ako.get_realtime_data(symbol=symbol, source=source)
+    """获取实时股票行情数据. 'eastmoney_direct' """
+
+    # 定义内部 fetch_func
+    def realtime_data_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        return ako.get_realtime_data(source=source, **kwargs)
+
+    df = _fetch_data_with_fallback(
+        fetch_func=realtime_data_fetcher,
+        primary_source="eastmoney_direct",
+        fallback_sources=["eastmoney", "xueqiu"],
+        symbol=symbol,
+    )
     return df.to_json(orient="records")
 
 
 @mcp.tool(name="get_news_data", description="获取股票相关的新闻数据")
 def get_news_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
 ) -> str:
     """获取股票相关新闻数据."""
     df = ako.get_news_data(symbol=symbol, source="eastmoney")
-    if recent_n is not None:
-        df = df.tail(recent_n)
     return df.to_json(orient="records")
 
 
 @mcp.tool(name="get_balance_sheet", description="获取公司的资产负债表数据")
 def get_balance_sheet(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
 ) -> str:
     """获取公司资产负债表数据."""
     df = ako.get_balance_sheet(symbol=symbol, source="sina")
-    if recent_n is not None:
-        df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
 @mcp.tool(name="get_income_statement", description="获取公司的利润表数据")
 def get_income_statement(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
 ) -> str:
     """获取公司利润表数据."""
     df = ako.get_income_statement(symbol=symbol, source="sina")
-    if recent_n is not None:
-        df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
 @mcp.tool(name="get_cash_flow", description="获取公司的现金流量表数据")
 def get_cash_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    source: Annotated[Literal["sina"], Field(description="数据来源")] = "sina",
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
 ) -> str:
     """获取公司现金流量表数据."""
-    df = ako.get_cash_flow(symbol=symbol, source=source)
-    if recent_n is not None:
-        df = df.head(recent_n)
+    df = ako.get_cash_flow(symbol=symbol, source="sina")
     return df.to_json(orient="records")
 
 
@@ -235,20 +318,17 @@ def get_inner_trade_data(
 @mcp.tool(name="get_financial_metrics", description="获取三大财务报表的关键财务指标")
 def get_financial_metrics(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
 ) -> str:
     """
     获取三大财务报表的关键财务指标.
     """
     df = ako.get_financial_metrics(symbol)
-    if recent_n is not None:
-        df = df.head(recent_n)
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="get_time_info", description="获取当前时间（ISO格式、时间戳）和最近一个交易日")
+@mcp.tool(
+    name="get_time_info", description="获取当前时间（ISO格式、时间戳）和最近一个交易日"
+)
 def get_time_info() -> dict:
     """获取当前时间（ISO格式、时间戳）和最近一个交易日."""
     local_time = datetime.now().astimezone()
@@ -256,7 +336,7 @@ def get_time_info() -> dict:
 
     # 获取交易日历数据
     trade_date_df = ak.tool_trade_date_hist_sina()
-    trade_dates = [d for d in trade_date_df["trade_date"]] # 提取所有交易日期
+    trade_dates = [d for d in trade_date_df["trade_date"]]  # 提取所有交易日期
 
     # 筛选出小于等于当前日期的交易日，并按降序排列
     past_dates = sorted([d for d in trade_dates if d <= current_date], reverse=True)
@@ -269,224 +349,193 @@ def get_time_info() -> dict:
         "timestamp": local_time.timestamp(),
         "last_trading_day": last_trading_day,
     }
+
+
 @mcp.tool(name="get_stock_basic_info", description="获取指定股票的基本概要信息")
 def get_stock_basic_info(
-    symbol: Annotated[str, Field(description="股票代码 (例如: '000001' 代表A股, '00700' 代表港股)")],
-    market_type: Annotated[
-        Literal["A股", "港股"], Field(description="市场类型: A股, 港股。默认: A股")
-    ] = "A股",
-    data_source: Annotated[
-        Literal["eastmoney", "xueqiu", "cninfo", "xq"],
-        Field(description="数据来源: eastmoney(东方财富), xueqiu(雪球), cninfo(巨潮资讯), xq(雪球)。默认: cninfo"),
-    ] = "cninfo",
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量，仅适用于部分接口", ge=1)
-    ] = None,
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
 ) -> str:
     """获取股票基本概要信息，支持 A 股和港股"""
-    try:
-        if market_type == "A股":
-            if data_source == "eastmoney":
-                df = ak.stock_individual_info_em(symbol)
-            elif data_source == "xueqiu":
-                df = ak.stock_individual_basic_info_xq(symbol="SH" + symbol)
-            elif data_source == "cninfo":
-                df = ak.stock_profile_cninfo(symbol)
-            elif data_source == "xq":
-                df = ak.stock_individual_basic_info_hk_xq(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for A股: {data_source}")
-        elif market_type == "港股":
-            if data_source == "eastmoney":
-                df = ak.stock_hk_company_profile_em(symbol)
-            elif data_source == "xq":
-                df = ak.stock_individual_basic_info_hk_xq(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for 港股: {data_source}")
-        else:
-            raise ValueError(f"Unsupported market_type: {market_type}")
 
-        if recent_n is not None:
-            df = df.tail(recent_n)
+    # 定义内部 fetch_func
+    def get_stock_basic_info_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        if source == "eastmoney":
+            df = ak.stock_individual_info_em(symbol)
+        elif source == "xueqiu":
+            df = ak.stock_individual_basic_info_xq(symbol)
+        elif source == "cninfo":
+            df = ak.stock_profile_cninfo(symbol)
+        elif source == "xq":
+            df = ak.stock_individual_basic_info_hk_xq(symbol)
+        return df
 
-        return df.to_json(orient="records")
-
-    except Exception as e:
-        return f"Error fetching stock basic info: {str(e)}"
+    df = _fetch_data_with_fallback(
+        fetch_func=get_stock_basic_info_fetcher,
+        primary_source="cninfo",
+        fallback_sources=[
+            "eastmoney",
+            "xq",
+            "xueqiu",
+        ],
+        symbol=symbol,
+    )
+    return df.to_json(orient="records")
 
 
 @mcp.tool(name="get_macro_data", description="获取宏观经济数据")
-def get_macro_data(
-    indicator: Annotated[
-        Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"],
-        Field(
-            description="宏观经济指标，可选值包括: money_supply(货币供应量), gdp(GDP数据), cpi(CPI数据), pmi(PMI数据), stock_summary(股市概览)等",
-            examples=["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
-        )
-    ],
-    data_source: Annotated[
-        Literal["sina", "eastmoney"],
-        Field(description="数据来源: sina, eastmoney。默认: sina"),
-    ] = "sina",
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 100,
-) -> str:
+def get_macro_data() -> str:
     """获取宏观经济数据"""
-    try:
+
+    def get_macro_data_fetcher(
+        indicator: str, source: str, **kwargs: Any
+    ) -> pd.DataFrame:
         if indicator == "money_supply":
-            if data_source == "sina":
-                df = ak.macro_china_money_supply()
-            else:
-                raise ValueError(f"Unsupported data_source for money_supply: {data_source}")
+            # if data_source == "sina":
+            df = ak.macro_china_money_supply()
         elif indicator == "gdp":
-            if data_source == "sina":
+            if source == "sina":
                 df = ak.macro_china_gdp()
-            elif data_source == "eastmoney":
-                df = ak.macro_china_gdp_yearly()
+            # elif data_source == "eastmoney":
             else:
-                raise ValueError(f"Unsupported data_source for gdp: {data_source}")
+                df = ak.macro_china_gdp_yearly()
         elif indicator == "cpi":
             df = ak.macro_china_cpi_monthly()
         elif indicator == "pmi":
             df = ak.macro_china_pmi_yearly()
         elif indicator == "stock_summary":
-            if data_source == "sina":
+            if source == "sina":
                 df = ak.stock_sse_summary()
-            elif data_source == "eastmoney":
-                df = ak.stock_szse_summary()
+            # elif data_source == "eastmoney":
             else:
-                raise ValueError(f"Unsupported data_source for stock_summary: {data_source}")
+                df = ak.stock_szse_summary()
+        return df
+
+    def get_all_macro_data_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        """
+        获取所有宏观经济数据.
+        
+        Args:
+            data_source: 数据源
+            **kwargs: 其他参数
+            
+        Returns:
+            pd.DataFrame: 包含所有宏观经济数据的DataFrame
+        """
+        df_list = []
+        indicators = ["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
+        
+        for indicator in indicators:
+            indicator_df = get_macro_data_fetcher(indicator, source)
+            if indicator_df is not None and not indicator_df.empty:
+                # 为DataFrame添加指标名称列，以便区分不同指标的数据
+                indicator_df['indicator'] = indicator
+                df_list.append(indicator_df)
+        
+        if df_list:
+            # 使用 pd.concat 一次性合并所有DataFrame
+            df = pd.concat(df_list, ignore_index=True)
         else:
-            raise ValueError(f"Unsupported indicator: {indicator}")
+            # 如果没有获取到任何数据，返回空的DataFrame
+            df = pd.DataFrame()
+            
+        return df
 
-        if recent_n is not None:
-            df = df.tail(recent_n)
-
-        return df.to_json(orient="records")
-
-    except Exception as e:
-        return f"Error fetching macro data: {str(e)}"
+    df = _fetch_data_with_fallback(
+        fetch_func=get_all_macro_data_fetcher,
+        primary_source="sina",
+        fallback_sources=["eastmoney"],
+    )
+    return df.to_json(orient="records")
 
 
 @mcp.tool(name="get_investor_sentiment", description="分析散户和机构投资者的投资情绪")
 def get_investor_sentiment(
-    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    indicator: Annotated[
-        Literal["retail_attention", "retail_bullish", "northbound_flow", "institution_research", "institution_participate"],
-        Field(description="情绪指标: retail_attention(散户关注), retail_bullish(散户看涨), northbound_flow(北向资金), institution_research(机构调研),institution_participate(机构关注)。默认: institution_participate"),
-    ] = "institution_participate",
-    data_source: Annotated[
-        Literal["eastmoney"],
-        Field(description="数据来源: eastmoney。默认: eastmoney"),
-    ] = "eastmoney",
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],   
 ) -> str:
     """分析散户和机构投资者的投资情绪"""
-    try:
+    
+    def get_investor_sentiment_fetcher(
+        symbol: str, indicator: str, **kwargs: Any
+    ) -> pd.DataFrame:
+        """获取投资情绪数据"""       
         if indicator == "retail_attention":
-            if data_source == "eastmoney":
-                df = ak.stock_comment_detail_scrd_focus_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for retail_attention: {data_source}")
+            df = ak.stock_comment_detail_scrd_focus_em(symbol)
         elif indicator == "retail_bullish":
-            if data_source == "eastmoney":      
-                df = ak.stock_comment_detail_scrd_desire_daily_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for retail_bullish: {data_source}")
-        elif indicator == "northbound_flow":
-            if data_source == "eastmoney":
-                df = ak.stock_hsgt_fund_flow_summary_em()
-            else:
-                raise ValueError(f"Unsupported data_source for northbound_flow: {data_source}")
+            df = ak.stock_comment_detail_scrd_desire_daily_em(symbol)           
+        # elif indicator == "northbound_flow":
+        #     df = ak.stock_hsgt_fund_flow_summary_em()          
         elif indicator == "institution_research":
-            if data_source == "eastmoney":
-                df = ak.stock_institute_recommend_detail(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for institution_research: {data_source}")
-        elif indicator == "institution_participate":
-            if data_source == "eastmoney":
-                df = ak.stock_comment_detail_zlkp_jgcyd_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for institution_participate: {data_source}")
+            df = ak.stock_institute_recommend_detail(symbol)
+        elif indicator == "institution_participate":       
+            df = ak.stock_comment_detail_zlkp_jgcyd_em(symbol)
+        return df
+
+    def get_all_investor_sentiment_fetcher(
+        symbol: str,  **kwargs: Any
+    ) -> pd.DataFrame:
+        df_list = []
+        indicators = [
+            "retail_attention",
+            "retail_bullish",
+            "institution_research",
+            "institution_participate",
+        ]
+        for indicator in indicators:
+            indicator_df = get_investor_sentiment_fetcher(symbol, indicator, **kwargs)
+            if indicator_df is not None and not indicator_df.empty:
+                # 为DataFrame添加指标名称列，以便区分不同指标的数据
+                indicator_df['indicator'] = indicator
+                df_list.append(indicator_df)
+        if df_list:
+            # 使用 pd.concat 一次性合并所有DataFrame
+            df = pd.concat(df_list, ignore_index=True)
         else:
-            raise ValueError(f"Unsupported indicator: {indicator}")
+            # 如果没有获取到任何数据，返回空的DataFrame
+            df = pd.DataFrame()
+        return df
 
-        if recent_n is not None:
-            df = df.tail(recent_n)
-
-        return df.to_json(orient="records")
-
-    except Exception as e:
-        return f"Error fetching investor sentiment data: {str(e)}"
+    df = get_all_investor_sentiment_fetcher(symbol) 
+    return df.to_json(orient="records")
 
 
 @mcp.tool(name="get_shareholder_info", description="获取指定股票的股东情况")
 def get_shareholder_info(
-    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    shareholder_type: Annotated[
-        Literal["shareholder_count"],
-        Field(description="股东类型: shareholder_count(股东户数)。默认: shareholder_count"),
-    ] = "shareholder_count",
-    data_source: Annotated[
-        Literal["eastmoney"],
-        Field(description="数据来源: eastmoney。默认: eastmoney"),
-    ] = "eastmoney",
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")]   
 ) -> str:
     """获取股东情况"""
-    try:
-        if shareholder_type == "shareholder_count":
-            if data_source == "eastmoney":
-                df = ak.stock_zh_a_gdhs_detail_em(symbol)  
-                print(df)         
-            else:
-                raise ValueError(f"Unsupported data_source for top_circulating: {data_source}")       
-        else:
-            raise ValueError(f"Unsupported shareholder_type: {shareholder_type}")
+    def get_shareholder_info_fetcher(
+        symbol: str, **kwargs: Any
+    ) -> pd.DataFrame:
+        """获取股东数据"""
+        return ak.stock_zh_a_gdhs_detail_em(symbol)
+    
+    df = get_shareholder_info_fetcher(symbol)    
+    return df.to_json(orient="records")
 
-        if recent_n is not None:
-            df = df.tail(recent_n)
-
-        return df.to_json(orient="records")
-
-    except Exception as e:
-        return f"Error fetching shareholder info: {str(e)}"
+  
 
 
 @mcp.tool(name="get_product_info", description="获取指定股票公司的主要产品或业务构成")
 def get_product_info(
-    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
-    info_type: Annotated[
-        Literal["business_composition"],
-        Field(description="信息类型: business_composition(主营构成)。默认: business_composition"),
-    ] = "business_composition",
-    data_source: Annotated[
-        Literal["ths", "eastmoney"],
-        Field(description="数据来源: ths(同花顺), eastmoney(东风财富网)。默认: ths"),
-    ] = "ths",
-    recent_n: Annotated[
-        int | None, Field(description="返回最近N条记录的数量", ge=1)
-    ] = 10,
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],   
 ) -> str:
     """获取产品情况"""
-    try:
-        if info_type == "business_composition":
-            if data_source == "ths":
-                df = ak.stock_zyjs_ths(symbol)
-            elif data_source == "eastmoney":
-                df = ak.stock_zygc_em(symbol)
-            else:
-                raise ValueError(f"Unsupported data_source for business_composition: {data_source}")       
+    def get_product_info_fetcher(
+        source:str,**kwargs: Any
+    ) -> pd.DataFrame:
+        if source == "ths":
+            df = ak.stock_zyjs_ths(symbol)
+        # elif data_source == "eastmoney":
+        else:
+            df = ak.stock_zygc_em(symbol)
+        return df
+  
+    df = _fetch_data_with_fallback(
+        fetch_func=get_product_info_fetcher,
+        primary_source="ths",
+        fallback_sources=["eastmoney"],
+        symbol=symbol,
+    )     
+    return df.to_json(orient="records")
 
-        if recent_n is not None:
-            df = df.tail(recent_n)
 
-        return df.to_json(orient="records")
-
-    except Exception as e:
-        return f"Error fetching product info: {str(e)}"
