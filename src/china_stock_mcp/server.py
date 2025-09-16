@@ -90,7 +90,7 @@ def get_hist_data(
         Field(description="复权类型: none, qfq(前复权), hfq(后复权)。默认：none"),
     ] = "none",
     indicators_list: Annotated[
-        list[
+        str | list[
             Literal[
                 "SMA",
                 "EMA",
@@ -130,7 +130,7 @@ def get_hist_data(
         ]
         | None,
         Field(
-            description="要添加的技术指标: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC"
+            description="要添加的技术指标，可以是逗号分隔的字符串（例如: 'SMA,EMA'）或字符串列表（例如: ['SMA', 'EMA']）。支持的指标包括: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC"
         ),
     ] = [
         "SMA",
@@ -186,56 +186,72 @@ def get_hist_data(
         end_date=end_date,
         adjust=adjust,
     )
+    indicator_map = {
+        "SMA": (indicators.get_sma, {"window": 20}),
+        "EMA": (indicators.get_ema, {"window": 20}),
+        "RSI": (indicators.get_rsi, {"window": 14}),
+        "MACD": (indicators.get_macd, {"fast": 12, "slow": 26, "signal": 9}),
+        "BOLL": (indicators.get_bollinger_bands, {"window": 20, "std": 2}),
+        "STOCH": (
+            indicators.get_stoch,
+            {"window": 14, "smooth_d": 3, "smooth_k": 3},
+        ),
+        "ATR": (indicators.get_atr, {"window": 14}),
+        "CCI": (indicators.get_cci, {"window": 14}),
+        "ADX": (indicators.get_adx, {"window": 14}),
+        "WILLR": (indicators.get_willr, {"window": 14}),
+        "AD": (indicators.get_ad, {}),
+        "ADOSC": (indicators.get_adosc, {"fast_period": 3, "slow_period": 10}),
+        "OBV": (indicators.get_obv, {}),
+        "MOM": (indicators.get_mom, {"window": 10}),
+        "SAR": (indicators.get_sar, {"acceleration": 0.02, "maximum": 0.2}),
+        "TSF": (indicators.get_tsf, {"window": 14}),
+        "APO": (
+            indicators.get_apo,
+            {"fast_period": 12, "slow_period": 26, "ma_type": 0},
+        ),
+        "AROON": (indicators.get_aroon, {"window": 14}),
+        "AROONOSC": (indicators.get_aroonosc, {"window": 14}),
+        "BOP": (indicators.get_bop, {}),
+        "CMO": (indicators.get_cmo, {"window": 14}),
+        "DX": (indicators.get_dx, {"window": 14}),
+        "MFI": (indicators.get_mfi, {"window": 14}),
+        "MINUS_DI": (indicators.get_minus_di, {"window": 14}),
+        "MINUS_DM": (indicators.get_minus_dm, {"window": 14}),
+        "PLUS_DI": (indicators.get_plus_di, {"window": 14}),
+        "PLUS_DM": (indicators.get_plus_dm, {"window": 14}),
+        "PPO": (
+            indicators.get_ppo,
+            {"fast_period": 12, "slow_period": 26, "ma_type": 0},
+        ),
+        "ROC": (indicators.get_roc, {"window": 10}),
+        "ROCP": (indicators.get_rocp, {"window": 10}),
+        "ROCR": (indicators.get_rocr, {"window": 10}),
+        "ROCR100": (indicators.get_rocr100, {"window": 10}),
+        "TRIX": (indicators.get_trix, {"window": 30}),
+        "ULTOSC": (
+            indicators.get_ultosc,
+            {"window1": 7, "window2": 14, "window3": 28},
+        ),
+    }
 
+
+    if isinstance(indicators_list, str):
+        indicators_list = [
+            indicator.strip()
+            for indicator in indicators_list.split(",")
+            if indicator.strip()
+        ]
+    
+    # 过滤掉无效的指标
     if indicators_list:
-        indicator_map = {
-            "SMA": (indicators.get_sma, {"window": 20}),
-            "EMA": (indicators.get_ema, {"window": 20}),
-            "RSI": (indicators.get_rsi, {"window": 14}),
-            "MACD": (indicators.get_macd, {"fast": 12, "slow": 26, "signal": 9}),
-            "BOLL": (indicators.get_bollinger_bands, {"window": 20, "std": 2}),
-            "STOCH": (
-                indicators.get_stoch,
-                {"window": 14, "smooth_d": 3, "smooth_k": 3},
-            ),
-            "ATR": (indicators.get_atr, {"window": 14}),
-            "CCI": (indicators.get_cci, {"window": 14}),
-            "ADX": (indicators.get_adx, {"window": 14}),
-            "WILLR": (indicators.get_willr, {"window": 14}),
-            "AD": (indicators.get_ad, {}),
-            "ADOSC": (indicators.get_adosc, {"fast_period": 3, "slow_period": 10}),
-            "OBV": (indicators.get_obv, {}),
-            "MOM": (indicators.get_mom, {"window": 10}),
-            "SAR": (indicators.get_sar, {"acceleration": 0.02, "maximum": 0.2}),
-            "TSF": (indicators.get_tsf, {"window": 14}),
-            "APO": (
-                indicators.get_apo,
-                {"fast_period": 12, "slow_period": 26, "ma_type": 0},
-            ),
-            "AROON": (indicators.get_aroon, {"window": 14}),
-            "AROONOSC": (indicators.get_aroonosc, {"window": 14}),
-            "BOP": (indicators.get_bop, {}),
-            "CMO": (indicators.get_cmo, {"window": 14}),
-            "DX": (indicators.get_dx, {"window": 14}),
-            "MFI": (indicators.get_mfi, {"window": 14}),
-            "MINUS_DI": (indicators.get_minus_di, {"window": 14}),
-            "MINUS_DM": (indicators.get_minus_dm, {"window": 14}),
-            "PLUS_DI": (indicators.get_plus_di, {"window": 14}),
-            "PLUS_DM": (indicators.get_plus_dm, {"window": 14}),
-            "PPO": (
-                indicators.get_ppo,
-                {"fast_period": 12, "slow_period": 26, "ma_type": 0},
-            ),
-            "ROC": (indicators.get_roc, {"window": 10}),
-            "ROCP": (indicators.get_rocp, {"window": 10}),
-            "ROCR": (indicators.get_rocr, {"window": 10}),
-            "ROCR100": (indicators.get_rocr100, {"window": 10}),
-            "TRIX": (indicators.get_trix, {"window": 30}),
-            "ULTOSC": (
-                indicators.get_ultosc,
-                {"window1": 7, "window2": 14, "window3": 28},
-            ),
-        }
+        valid_indicators = []
+        for indicator in indicators_list:
+            if indicator in indicator_map:
+                valid_indicators.append(indicator)
+            else:
+                print(f"警告: 指标 '{indicator}' 不存在，将被忽略。")
+        indicators_list = valid_indicators
         temp = []
         for indicator in indicators_list:
             if indicator in indicator_map:
@@ -537,5 +553,6 @@ def get_product_info(
         symbol=symbol,
     )     
     return df.to_json(orient="records")
+
 
 

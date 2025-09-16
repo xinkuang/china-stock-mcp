@@ -43,7 +43,7 @@
 - `start_date` (string): 开始日期，格式为 'YYYY-MM-DD'，默认为 '1970-01-01'
 - `end_date` (string): 结束日期，格式为 'YYYY-MM-DD'，默认为 '2030-12-31'
 - `adjust` (string): 复权类型 ('none', 'qfq', 'hfq')，默认为 'none'
-- `indicators_list` (list): 要添加的技术指标列表
+- `indicators_list` (string|list): 要添加的技术指标，可以是逗号分隔的字符串（例如: 'SMA,EMA'）或字符串列表（例如: ['SMA', 'EMA']）。支持的指标包括: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC
 
 
 **支持的技术指标** (共 30+ 种):
@@ -139,7 +139,7 @@ SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR
 
 ## 🚀 安装和运行
 
-### 方法一: 使用 Smithery（推荐）
+### 方法一: 使用 Smithery
 
 通过 [Smithery](https://smithery.ai/server/@xinkuang/china-stock-mcp) 自动安装到 Claude Desktop：
 
