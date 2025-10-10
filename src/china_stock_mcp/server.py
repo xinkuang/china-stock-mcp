@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Annotated, Literal, Callable, Any, List
+import json
 
 import akshare as ak
 import akshare_one as ako
@@ -32,6 +33,8 @@ def _fetch_data_with_fallback(
     Raises:
         RuntimeError: 如果所有数据源都未能获取到有效数据。
     """
+    if primary_source is None:
+        return fetch_func(**kwargs)
     data_source_priority = [primary_source] + fallback_sources
     # 移除重复项并保持顺序
     seen = set()
@@ -65,6 +68,21 @@ def _fetch_data_with_fallback(
 
     return df
 
+def _get_market_from_symbol(symbol: str) -> str:
+    """
+    根据股票代码判断所属市场。
+    上海证券交易所: sh (600, 601, 603, 605, 688 开头)
+    深圳证券交易所: sz (000, 001, 002, 300 开头)
+    北京证券交易所: bj (830, 870, 880 开头)
+    默认返回 "sh"
+    """
+    if symbol.startswith(("600", "601", "603", "605", "688")):
+        return "sh"
+    elif symbol.startswith(("000", "001", "002", "300")):
+        return "sz"
+    elif symbol.startswith(("830", "870", "880")):
+        return "bj"
+    return "sh" # 默认上海市场
 
 mcp = FastMCP(name="china-stock-mcp")  # 初始化 FastMCP 服务器实例
 
@@ -127,49 +145,13 @@ def get_hist_data(
                 "TRIX",
                 "ULTOSC",
             ]
-        ]
-        | None,
+        ],
         Field(
             description="要添加的技术指标，可以是逗号分隔的字符串（例如: 'SMA,EMA'）或字符串列表（例如: ['SMA', 'EMA']）。支持的指标包括: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC"
         ),
-    ] = [
-        "SMA",
-        "EMA",
-        "RSI",
-        "MACD",
-        "BOLL",
-        "STOCH",
-        "ATR",
-        "CCI",
-        "ADX",
-        "WILLR",
-        "AD",
-        "ADOSC",
-        "OBV",
-        "MOM",
-        "SAR",
-        "TSF",
-        "APO",
-        "AROON",
-        "AROONOSC",
-        "BOP",
-        "CMO",
-        "DX",
-        "MFI",
-        "MINUS_DI",
-        "MINUS_DM",
-        "PLUS_DI",
-        "PLUS_DM",
-        "PPO",
-        "ROC",
-        "ROCP",
-        "ROCR",
-        "ROCR100",
-        "TRIX",
-        "ULTOSC",
-    ],
+    ] = ["SMA","EMA","RSI","MACD"],
 ) -> str:
-    """获取股票历史行情数据. 'eastmoney_direct' 支持所有 A, B, H 股"""
+    """获取股票历史行情数据."""
 
     # 定义内部 fetch_func
     def hist_data_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
@@ -235,12 +217,14 @@ def get_hist_data(
         ),
     }
 
-
-    if isinstance(indicators_list, str):
+    print("indicators_list: ", indicators_list)
+    if indicators_list is None:
+        indicators_list = []
+    elif isinstance(indicators_list, str):
         indicators_list = [
             indicator.strip()
             for indicator in indicators_list.split(",")
-            if indicator.strip()
+            if indicator.strip()  
         ]
     
     # 过滤掉无效的指标
@@ -260,16 +244,15 @@ def get_hist_data(
                 temp.append(indicator_df)
         if temp:
             df = df.join(temp)
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
-
 
 @mcp.tool(
     name="get_realtime_data", description="获取股票的实时行情数据，支持多种数据源"
 )
 def get_realtime_data(
-    symbol: Annotated[
-        str | None, Field(description="股票代码 (例如: '000001')")
-    ] = None,
+   symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")]
 ) -> str:
     """获取实时股票行情数据. 'eastmoney_direct' """
 
@@ -283,8 +266,11 @@ def get_realtime_data(
         fallback_sources=["eastmoney", "xueqiu"],
         symbol=symbol,
     )
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
 
+   
 
 @mcp.tool(name="get_news_data", description="获取股票相关的新闻数据")
 def get_news_data(
@@ -292,6 +278,8 @@ def get_news_data(
 ) -> str:
     """获取股票相关新闻数据."""
     df = ako.get_news_data(symbol=symbol, source="eastmoney")
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
 
 
@@ -301,33 +289,52 @@ def get_balance_sheet(
 ) -> str:
     """获取公司资产负债表数据."""
     df = ako.get_balance_sheet(symbol=symbol, source="sina")
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="get_income_statement", description="获取公司的利润表数据")
+@mcp.tool(name="get_income_statement", description="获取指定股票代码的公司的利润表数据")
 def get_income_statement(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
 ) -> str:
     """获取公司利润表数据."""
     df = ako.get_income_statement(symbol=symbol, source="sina")
+    if df.empty:
+        return json.dumps([])
+
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="get_cash_flow", description="获取公司的现金流量表数据")
+@mcp.tool(name="get_cash_flow", description="获取指定股票代码的公司的现金流量表数据")
 def get_cash_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
 ) -> str:
     """获取公司现金流量表数据."""
     df = ako.get_cash_flow(symbol=symbol, source="sina")
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
 
 
-@mcp.tool(name="get_inner_trade_data", description="获取公司的内部交易数据")
+@mcp.tool(name="get_fund_flow", description="获取股票的近 100 个交易日的资金流数据")
+def get_fund_flow(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+) -> str:   
+    market = _get_market_from_symbol(symbol)
+    df = ak.stock_individual_fund_flow(stock=symbol, market=market)
+    if df.empty:
+        return json.dumps([])
+    return df.to_json(orient="records")
+
+@mcp.tool(name="get_inner_trade_data", description="获取公司的内部股东交易数据")
 def get_inner_trade_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
 ) -> str:
-    """获取公司内部交易数据."""
+    """获取公司内部股东交易数据."""
     df = ako.get_inner_trade_data(symbol, source="xueqiu")
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
 
 
@@ -339,6 +346,8 @@ def get_financial_metrics(
     获取三大财务报表的关键财务指标.
     """
     df = ako.get_financial_metrics(symbol)
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
 
 
@@ -395,38 +404,42 @@ def get_stock_basic_info(
         ],
         symbol=symbol,
     )
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
-
 
 @mcp.tool(name="get_macro_data", description="获取宏观经济数据")
 def get_macro_data() -> str:
     """获取宏观经济数据"""
 
-    def get_macro_data_fetcher(
-        indicator: str, source: str, **kwargs: Any
-    ) -> pd.DataFrame:
-        if indicator == "money_supply":
-            # if data_source == "sina":
-            df = ak.macro_china_money_supply()
-        elif indicator == "gdp":
-            if source == "sina":
-                df = ak.macro_china_gdp()
-            # elif data_source == "eastmoney":
-            else:
-                df = ak.macro_china_gdp_yearly()
-        elif indicator == "cpi":
-            df = ak.macro_china_cpi_monthly()
-        elif indicator == "pmi":
-            df = ak.macro_china_pmi_yearly()
-        elif indicator == "stock_summary":
-            if source == "sina":
-                df = ak.stock_sse_summary()
-            # elif data_source == "eastmoney":
-            else:
-                df = ak.stock_szse_summary()
+    def _clean_macro_data(df: pd.DataFrame) -> pd.DataFrame:
+        """
+        通用数据清洗函数，删除全 null 列和全 null 行。
+        """
+        if df.empty:
+            return df
+        # 删除所有列值都为 null 的列
+        df = df.dropna(axis=1, how='all')
+        # 删除所有行值都为 null 的行
+        df = df.dropna(axis=0, how='all')
         return df
 
-    def get_all_macro_data_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+    def get_macro_data_fetcher(
+        indicator: str, **kwargs: Any
+    ) -> pd.DataFrame:
+        if indicator == "money_supply":           
+            df = ak.macro_china_money_supply()
+        elif indicator == "gdp":
+            df = ak.macro_china_gdp_yearly()
+        elif indicator == "cpi":
+            df = ak.macro_china_cpi_yearly()
+        elif indicator == "pmi":
+            df = ak.macro_china_pmi_yearly()
+        elif indicator == "stock_summary":           
+            df = ak.macro_china_stock_market_cap()    
+        return df
+
+    def get_all_macro_data_fetcher( **kwargs: Any) -> pd.DataFrame:
         """
         获取所有宏观经济数据.
         
@@ -441,27 +454,27 @@ def get_macro_data() -> str:
         indicators = ["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
         
         for indicator in indicators:
-            indicator_df = get_macro_data_fetcher(indicator, source)
+            indicator_df = get_macro_data_fetcher(indicator)
             if indicator_df is not None and not indicator_df.empty:
+                indicator_df = _clean_macro_data(indicator_df)
                 # 为DataFrame添加指标名称列，以便区分不同指标的数据
                 indicator_df['indicator'] = indicator
                 df_list.append(indicator_df)
         
         if df_list:
             # 使用 pd.concat 一次性合并所有DataFrame
-            df = pd.concat(df_list, ignore_index=True)
+            df = pd.concat(df_list, ignore_index=True)          
         else:
             # 如果没有获取到任何数据，返回空的DataFrame
             df = pd.DataFrame()
             
         return df
 
-    df = _fetch_data_with_fallback(
-        fetch_func=get_all_macro_data_fetcher,
-        primary_source="sina",
-        fallback_sources=["eastmoney"],
-    )
+    df = get_all_macro_data_fetcher()
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
+   
 
 
 @mcp.tool(name="get_investor_sentiment", description="分析散户和机构投资者的投资情绪")
@@ -511,7 +524,10 @@ def get_investor_sentiment(
         return df
 
     df = get_all_investor_sentiment_fetcher(symbol) 
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
+
 
 
 @mcp.tool(name="get_shareholder_info", description="获取指定股票的股东情况")
@@ -526,6 +542,9 @@ def get_shareholder_info(
         return ak.stock_zh_a_gdhs_detail_em(symbol)
     
     df = get_shareholder_info_fetcher(symbol)    
+    if df.empty:
+        return json.dumps([])
+
     return df.to_json(orient="records")
 
   
@@ -552,7 +571,33 @@ def get_product_info(
         fallback_sources=["eastmoney"],
         symbol=symbol,
     )     
+    if df.empty:
+        return json.dumps([])
     return df.to_json(orient="records")
 
 
+
+@mcp.tool(name="get_profit_forecast", description="获取股票的业绩预测数据，包括预测年报净利润和每股收益")
+def get_profit_forecast(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '600519')")],   
+) -> str:
+    """
+    获取股票的业绩预测数据。
+    """
+    supported_indicators = ["预测年报净利润", "预测年报每股收益"]
+    df_list = []
+    for ind in supported_indicators:
+            temp_df = ak.stock_profit_forecast_ths(symbol=symbol, indicator=ind)
+            if not temp_df.empty:
+                temp_df["indicator"] = ind  # 添加指标列以便区分
+                df_list.append(temp_df)
+        
+    if df_list:
+            df = pd.concat(df_list, ignore_index=True)
+    else:
+            return json.dumps([])
+
+    if df.empty:
+            return json.dumps([])
+    return df.to_json(orient="records", force_ascii=False)
 

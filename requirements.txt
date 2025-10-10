@@ -2,7 +2,7 @@ uvicorn==0.35.0
 starlette==0.47.3
 fastmcp==2.11.3
 akshare==1.17.42
-akshare-one==0.3.10
+akshare-one==0.3.12
 pydantic==2.11.7
 pydantic-core==2.33.2
 annotated-types==0.7.0
