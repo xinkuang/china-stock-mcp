@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Annotated, Literal, Callable, Any, List
+import io
 import json
 
 import akshare as ak
@@ -84,6 +85,37 @@ def _get_market_from_symbol(symbol: str) -> str:
         return "bj"
     return "sh" # 默认上海市场
 
+def _format_dataframe_output(
+    df: pd.DataFrame,
+    output_format: Literal["json", "csv", "xml", "excel", "markdown", "html"],
+) -> str:
+    """
+    根据指定的格式格式化 DataFrame 输出。
+    """
+    if df.empty:
+        return json.dumps([])
+
+    if output_format == "json":
+        return df.to_json(orient="records", force_ascii=False)
+    elif output_format == "csv":
+        return df.to_csv(index=False)
+    elif output_format == "xml":
+        return df.to_xml(index=False)
+    elif output_format == "excel":
+        # 使用 BytesIO 将 Excel 写入内存
+        output = io.BytesIO()
+        df.to_excel(output, index=False, engine='openpyxl')
+        # 返回 base64 编码的二进制数据，或者直接返回字节流
+        # 为了兼容性，这里尝试返回 utf-8 编码的字符串，但对于二进制文件，通常直接传输字节流更合适
+        return output.getvalue().decode("utf-8", errors="ignore")
+    elif output_format == "markdown":
+        return df.to_markdown(index=False)
+    elif output_format == "html":
+        return df.to_html(index=False)
+    else:
+        return df.to_json(orient="records", force_ascii=False)
+
+
 mcp = FastMCP(name="china-stock-mcp")  # 初始化 FastMCP 服务器实例
 
 
@@ -145,11 +177,15 @@ def get_hist_data(
                 "TRIX",
                 "ULTOSC",
             ]
-        ],
+        ]|None,
         Field(
             description="要添加的技术指标，可以是逗号分隔的字符串（例如: 'SMA,EMA'）或字符串列表（例如: ['SMA', 'EMA']）。支持的指标包括: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC"
         ),
-    ] = ["SMA","EMA","RSI","MACD"],
+    ] = "SMA,EMA,RSI,MACD",
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取股票历史行情数据."""
 
@@ -244,15 +280,17 @@ def get_hist_data(
                 temp.append(indicator_df)
         if temp:
             df = df.join(temp)
-    if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+    return _format_dataframe_output(df, output_format)
 
 @mcp.tool(
     name="get_realtime_data", description="获取股票的实时行情数据，支持多种数据源"
 )
 def get_realtime_data(
-   symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")]
+   symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取实时股票行情数据. 'eastmoney_direct' """
 
@@ -266,89 +304,112 @@ def get_realtime_data(
         fallback_sources=["eastmoney", "xueqiu"],
         symbol=symbol,
     )
-    if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+    return _format_dataframe_output(df, output_format)
 
    
 
 @mcp.tool(name="get_news_data", description="获取股票相关的新闻数据")
 def get_news_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取股票相关新闻数据."""
     df = ako.get_news_data(symbol=symbol, source="eastmoney")
-    if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+    return _format_dataframe_output(df, output_format)
 
 
 @mcp.tool(name="get_balance_sheet", description="获取公司的资产负债表数据")
 def get_balance_sheet(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取公司资产负债表数据."""
     df = ako.get_balance_sheet(symbol=symbol, source="sina")
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 
 @mcp.tool(name="get_income_statement", description="获取指定股票代码的公司的利润表数据")
 def get_income_statement(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json"
 ) -> str:
     """获取公司利润表数据."""
     df = ako.get_income_statement(symbol=symbol, source="sina")
     if df.empty:
-        return json.dumps([])
-
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 
 @mcp.tool(name="get_cash_flow", description="获取指定股票代码的公司的现金流量表数据")
 def get_cash_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取公司现金流量表数据."""
     df = ako.get_cash_flow(symbol=symbol, source="sina")
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_fund_flow", description="获取股票的近 100 个交易日的资金流数据")
+@mcp.tool(name="get_fund_flow", description="获取股票的近 100 个交易日的资金流向数据")
 def get_fund_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:   
     market = _get_market_from_symbol(symbol)
     df = ak.stock_individual_fund_flow(stock=symbol, market=market)
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 @mcp.tool(name="get_inner_trade_data", description="获取公司的内部股东交易数据")
 def get_inner_trade_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取公司内部股东交易数据."""
     df = ako.get_inner_trade_data(symbol, source="xueqiu")
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 
 @mcp.tool(name="get_financial_metrics", description="获取三大财务报表的关键财务指标")
 def get_financial_metrics(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """
     获取三大财务报表的关键财务指标.
     """
     df = ako.get_financial_metrics(symbol)
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 
 @mcp.tool(
@@ -379,6 +440,10 @@ def get_time_info() -> dict:
 @mcp.tool(name="get_stock_basic_info", description="获取指定股票的基本概要信息")
 def get_stock_basic_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取股票基本概要信息，支持 A 股和港股"""
 
@@ -405,81 +470,118 @@ def get_stock_basic_info(
         symbol=symbol,
     )
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 @mcp.tool(name="get_macro_data", description="获取宏观经济数据")
-def get_macro_data() -> str:
-    """获取宏观经济数据"""
+def get_macro_data(    
+    indicators_list: Annotated[
+        str | List[Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"]] | None,
+        Field(description="要获取的宏观经济指标，可以是逗号分隔的字符串（例如: 'gdp,cpi'）或字符串列表（例如: ['gdp', 'cpi']）。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: ['gdp']"),
+    ] = None,
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json"
+    ) -> str:
+        """获取宏观经济数据"""
 
-    def _clean_macro_data(df: pd.DataFrame) -> pd.DataFrame:
-        """
-        通用数据清洗函数，删除全 null 列和全 null 行。
-        """
-        if df.empty:
+        # 定义支持的宏观经济指标
+        SUPPORTED_MACRO_INDICATORS = ["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
+
+        # 处理 indicators_list 参数
+        if indicators_list is None:
+            processed_indicators = ["gdp"]  # 默认值
+        elif isinstance(indicators_list, str):
+            # 将逗号分隔的字符串转换为列表，并去除空白
+            processed_indicators = [
+                indicator.strip()
+                for indicator in indicators_list.split(",")
+                if indicator.strip()
+            ]
+        else:  # List[Literal[...]]
+            processed_indicators = indicators_list
+
+        # 过滤掉不支持的指标
+        valid_indicators = []
+        for indicator in processed_indicators:
+            if indicator in SUPPORTED_MACRO_INDICATORS:
+                valid_indicators.append(indicator)
+            else:
+                print(f"警告: 宏观经济指标 '{indicator}' 不存在或不支持，将被忽略。")
+
+        if not valid_indicators:
+            valid_indicators = ["gdp"] # 如果所有指标都被过滤掉，则使用默认值
+
+        def _clean_macro_data(df: pd.DataFrame) -> pd.DataFrame:
+            """
+            通用数据清洗函数，删除全 null 列和全 null 行。
+            """
+            if df.empty:
+                return df
+            # 删除所有列值都为 null 的列
+            df = df.dropna(axis=1, how='all')
+            # 删除所有行值都为 null 的行
+            df = df.dropna(axis=0, how='all')
             return df
-        # 删除所有列值都为 null 的列
-        df = df.dropna(axis=1, how='all')
-        # 删除所有行值都为 null 的行
-        df = df.dropna(axis=0, how='all')
-        return df
 
-    def get_macro_data_fetcher(
-        indicator: str, **kwargs: Any
-    ) -> pd.DataFrame:
-        if indicator == "money_supply":           
-            df = ak.macro_china_money_supply()
-        elif indicator == "gdp":
-            df = ak.macro_china_gdp_yearly()
-        elif indicator == "cpi":
-            df = ak.macro_china_cpi_yearly()
-        elif indicator == "pmi":
-            df = ak.macro_china_pmi_yearly()
-        elif indicator == "stock_summary":           
-            df = ak.macro_china_stock_market_cap()    
-        return df
+        def get_macro_data_fetcher(
+            indicator: str, **kwargs: Any
+        ) -> pd.DataFrame:
+            if indicator == "money_supply":           
+                df = ak.macro_china_money_supply()
+            elif indicator == "gdp":
+                df = ak.macro_china_gdp_yearly()
+            elif indicator == "cpi":
+                df = ak.macro_china_cpi_yearly()
+            elif indicator == "pmi":
+                df = ak.macro_china_pmi_yearly()
+            elif indicator == "stock_summary":           
+                df = ak.macro_china_stock_market_cap()    
+            return df
 
-    def get_all_macro_data_fetcher( **kwargs: Any) -> pd.DataFrame:
-        """
-        获取所有宏观经济数据.
-        
-        Args:
-            data_source: 数据源
-            **kwargs: 其他参数
+        def get_all_macro_data_fetcher(indicators_to_fetch: List[str], **kwargs: Any) -> pd.DataFrame:
+            """
+            获取所有宏观经济数据.
             
-        Returns:
-            pd.DataFrame: 包含所有宏观经济数据的DataFrame
-        """
-        df_list = []
-        indicators = ["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
-        
-        for indicator in indicators:
-            indicator_df = get_macro_data_fetcher(indicator)
-            if indicator_df is not None and not indicator_df.empty:
-                indicator_df = _clean_macro_data(indicator_df)
-                # 为DataFrame添加指标名称列，以便区分不同指标的数据
-                indicator_df['indicator'] = indicator
-                df_list.append(indicator_df)
-        
-        if df_list:
-            # 使用 pd.concat 一次性合并所有DataFrame
-            df = pd.concat(df_list, ignore_index=True)          
-        else:
-            # 如果没有获取到任何数据，返回空的DataFrame
-            df = pd.DataFrame()
+            Args:
+                indicators_to_fetch: 要获取的宏观经济指标列表。
+                **kwargs: 其他参数
+                
+            Returns:
+                pd.DataFrame: 包含所有宏观经济数据的DataFrame
+            """
+            df_list = []
             
-        return df
+            for indicator in indicators_to_fetch:
+                indicator_df = get_macro_data_fetcher(indicator)
+                if indicator_df is not None and not indicator_df.empty:
+                    indicator_df = _clean_macro_data(indicator_df)
+                    # 为DataFrame添加指标名称列，以便区分不同指标的数据
+                    indicator_df['indicator'] = indicator
+                    df_list.append(indicator_df)
+            
+            if df_list:
+                # 使用 pd.concat 一次性合并所有DataFrame
+                df = pd.concat(df_list, ignore_index=True)          
+            else:
+                # 如果没有获取到任何数据，返回空的DataFrame
+                df = pd.DataFrame()
+                
+            return df
 
-    df = get_all_macro_data_fetcher()
-    if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = get_all_macro_data_fetcher(valid_indicators)
+        return _format_dataframe_output(df, output_format)
    
 
 
 @mcp.tool(name="get_investor_sentiment", description="分析散户和机构投资者的投资情绪")
 def get_investor_sentiment(
-    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],   
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],  
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json", 
 ) -> str:
     """分析散户和机构投资者的投资情绪"""
     
@@ -487,15 +589,15 @@ def get_investor_sentiment(
         symbol: str, indicator: str, **kwargs: Any
     ) -> pd.DataFrame:
         """获取投资情绪数据"""       
-        if indicator == "retail_attention":
+        if indicator == "用户关注指数":
             df = ak.stock_comment_detail_scrd_focus_em(symbol)
-        elif indicator == "retail_bullish":
+        elif indicator == "日度市场参与意愿":
             df = ak.stock_comment_detail_scrd_desire_daily_em(symbol)           
         # elif indicator == "northbound_flow":
         #     df = ak.stock_hsgt_fund_flow_summary_em()          
-        elif indicator == "institution_research":
+        elif indicator == "股票评级记录":
             df = ak.stock_institute_recommend_detail(symbol)
-        elif indicator == "institution_participate":       
+        elif indicator == "机构参与度":       
             df = ak.stock_comment_detail_zlkp_jgcyd_em(symbol)
         return df
 
@@ -504,10 +606,10 @@ def get_investor_sentiment(
     ) -> pd.DataFrame:
         df_list = []
         indicators = [
-            "retail_attention",
-            "retail_bullish",
-            "institution_research",
-            "institution_participate",
+            "用户关注指数",
+            "日度市场参与意愿",
+            "股票评级记录",
+            "机构参与度",
         ]
         for indicator in indicators:
             indicator_df = get_investor_sentiment_fetcher(symbol, indicator, **kwargs)
@@ -525,14 +627,18 @@ def get_investor_sentiment(
 
     df = get_all_investor_sentiment_fetcher(symbol) 
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 
 
 @mcp.tool(name="get_shareholder_info", description="获取指定股票的股东情况")
 def get_shareholder_info(
-    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")]   
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")]  ,
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """获取股东情况"""
     def get_shareholder_info_fetcher(
@@ -543,16 +649,19 @@ def get_shareholder_info(
     
     df = get_shareholder_info_fetcher(symbol)    
     if df.empty:
-        return json.dumps([])
-
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
   
 
 
 @mcp.tool(name="get_product_info", description="获取指定股票公司的主要产品或业务构成")
 def get_product_info(
-    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],   
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")], 
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",  
 ) -> str:
     """获取产品情况"""
     def get_product_info_fetcher(
@@ -572,14 +681,18 @@ def get_product_info(
         symbol=symbol,
     )     
     if df.empty:
-        return json.dumps([])
-    return df.to_json(orient="records")
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
 
 
 @mcp.tool(name="get_profit_forecast", description="获取股票的业绩预测数据，包括预测年报净利润和每股收益")
 def get_profit_forecast(
     symbol: Annotated[str, Field(description="股票代码 (例如: '600519')")],   
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
 ) -> str:
     """
     获取股票的业绩预测数据。
@@ -595,9 +708,6 @@ def get_profit_forecast(
     if df_list:
             df = pd.concat(df_list, ignore_index=True)
     else:
-            return json.dumps([])
-
-    if df.empty:
-            return json.dumps([])
-    return df.to_json(orient="records", force_ascii=False)
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
 
