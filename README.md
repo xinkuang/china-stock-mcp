@@ -1,4 +1,5 @@
 # china-stock-mcp
+[![smithery badge](https://smithery.ai/badge/@xinkuang/china-stock-mcp)](https://smithery.ai/server/@xinkuang/china-stock-mcp)
 一款基于 [akshare-one](https://github.com/zwldarren/akshare-one) 构建的 MCP (Model Context Protocol) 服务器，为中国股市数据提供接口。提供了一系列工具，用于获取财务信息，包括历史股票数据、实时数据、新闻数据、财务报表等。
 
 
@@ -171,7 +172,7 @@
 通过 [Smithery](https://smithery.ai/server/@xinkuang/china-stock-mcp) 自动安装到 Claude Desktop：
 
 ```bash
-npx -y @smithery/cli install @xinkuang/china-stock-mcp --client claude
+npx -y @smithery/cli install @xinkuang/china-stock-mcp
 ```
 
 ### 方法二: 使用 Docker
@@ -387,3 +388,4 @@ A: 使用 Smithery 安装的可以自动更新，手动安装的请重新拉取�
 ## 🐞 调试
 
 有关如何使用 @modelcontextprotocol/inspector 调试此服务器的详细信息，请参阅 [DEBUG.md](DEBUG.md)。
+
