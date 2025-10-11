@@ -124,12 +124,12 @@
 - `symbol` (string): 股票代码 (例如: '000001')
 - `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
 
-### 12. `获取宏观经济数据` (get_macro_data)
+### 12. `获取单个宏观经济指标数据` (get_macro_data)
 
-获取宏观经济数据
+获取单个宏观经济指标数据
 
 **参数:**
-- `indicators_list` (string|List): 要获取的宏观经济指标，可以是逗号分隔的字符串（例如: 'gdp,cpi'）或字符串列表（例如: ['gdp', 'cpi']）。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: ['gdp']
+- `indicator` (Literal): 要获取的宏观经济指标。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: 'gdp'
 - `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
 
 ### 13. `分析散户和机构投资者的投资情绪` (get_investor_sentiment)

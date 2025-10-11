@@ -473,45 +473,18 @@ def get_stock_basic_info(
         df = pd.DataFrame()
     return _format_dataframe_output(df, output_format)
 
-@mcp.tool(name="get_macro_data", description="获取宏观经济数据")
+@mcp.tool(name="get_macro_data", description="获取单个宏观经济指标数据")
 def get_macro_data(    
-    indicators_list: Annotated[
-        str | List[Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"]] | None,
-        Field(description="要获取的宏观经济指标，可以是逗号分隔的字符串（例如: 'gdp,cpi'）或字符串列表（例如: ['gdp', 'cpi']）。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: ['gdp']"),
-    ] = None,
+    indicator: Annotated[
+        Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"],
+        Field(description="要获取的宏观经济指标。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: 'gdp'"),
+    ] = "gdp",
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
         Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
     ] = "json"
     ) -> str:
         """获取宏观经济数据"""
-
-        # 定义支持的宏观经济指标
-        SUPPORTED_MACRO_INDICATORS = ["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
-
-        # 处理 indicators_list 参数
-        if indicators_list is None:
-            processed_indicators = ["gdp"]  # 默认值
-        elif isinstance(indicators_list, str):
-            # 将逗号分隔的字符串转换为列表，并去除空白
-            processed_indicators = [
-                indicator.strip()
-                for indicator in indicators_list.split(",")
-                if indicator.strip()
-            ]
-        else:  # List[Literal[...]]
-            processed_indicators = indicators_list
-
-        # 过滤掉不支持的指标
-        valid_indicators = []
-        for indicator in processed_indicators:
-            if indicator in SUPPORTED_MACRO_INDICATORS:
-                valid_indicators.append(indicator)
-            else:
-                print(f"警告: 宏观经济指标 '{indicator}' 不存在或不支持，将被忽略。")
-
-        if not valid_indicators:
-            valid_indicators = ["gdp"] # 如果所有指标都被过滤掉，则使用默认值
 
         def _clean_macro_data(df: pd.DataFrame) -> pd.DataFrame:
             """
@@ -526,54 +499,29 @@ def get_macro_data(
             return df
 
         def get_macro_data_fetcher(
-            indicator: str, **kwargs: Any
+            indicator_name: str, **kwargs: Any
         ) -> pd.DataFrame:
-            if indicator == "money_supply":           
+            if indicator_name == "money_supply":           
                 df = ak.macro_china_money_supply()
-            elif indicator == "gdp":
+            elif indicator_name == "gdp":
                 df = ak.macro_china_gdp_yearly()
-            elif indicator == "cpi":
+            elif indicator_name == "cpi":
                 df = ak.macro_china_cpi_yearly()
-            elif indicator == "pmi":
+            elif indicator_name == "pmi":
                 df = ak.macro_china_pmi_yearly()
-            elif indicator == "stock_summary":           
+            elif indicator_name == "stock_summary":           
                 df = ak.macro_china_stock_market_cap()    
             return df
 
-        def get_all_macro_data_fetcher(indicators_to_fetch: List[str], **kwargs: Any) -> pd.DataFrame:
-            """
-            获取所有宏观经济数据.
+        df = get_macro_data_fetcher(indicator)
+        if df is not None and not df.empty:
+            df = _clean_macro_data(df)
+            df['indicator'] = indicator # 添加指标名称列
+        else:
+            df = pd.DataFrame() # 如果没有获取到数据，返回空的DataFrame
             
-            Args:
-                indicators_to_fetch: 要获取的宏观经济指标列表。
-                **kwargs: 其他参数
-                
-            Returns:
-                pd.DataFrame: 包含所有宏观经济数据的DataFrame
-            """
-            df_list = []
-            
-            for indicator in indicators_to_fetch:
-                indicator_df = get_macro_data_fetcher(indicator)
-                if indicator_df is not None and not indicator_df.empty:
-                    indicator_df = _clean_macro_data(indicator_df)
-                    # 为DataFrame添加指标名称列，以便区分不同指标的数据
-                    indicator_df['indicator'] = indicator
-                    df_list.append(indicator_df)
-            
-            if df_list:
-                # 使用 pd.concat 一次性合并所有DataFrame
-                df = pd.concat(df_list, ignore_index=True)          
-            else:
-                # 如果没有获取到任何数据，返回空的DataFrame
-                df = pd.DataFrame()
-                
-            return df
-
-        df = get_all_macro_data_fetcher(valid_indicators)
         return _format_dataframe_output(df, output_format)
    
-
 
 @mcp.tool(name="get_investor_sentiment", description="分析散户和机构投资者的投资情绪")
 def get_investor_sentiment(
@@ -652,8 +600,6 @@ def get_shareholder_info(
         df = pd.DataFrame()
     return _format_dataframe_output(df, output_format)
 
-  
-
 
 @mcp.tool(name="get_product_info", description="获取指定股票公司的主要产品或业务构成")
 def get_product_info(
@@ -710,4 +656,3 @@ def get_profit_forecast(
     else:
         df = pd.DataFrame()
     return _format_dataframe_output(df, output_format)
-
