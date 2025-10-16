@@ -296,12 +296,16 @@ def get_realtime_data(
 
     # 定义内部 fetch_func
     def realtime_data_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
-        return ako.get_realtime_data(source=source, **kwargs)
+        if source == "xueqiu":
+            return ak.stock_individual_spot_xq(**kwargs)
+        else:
+            return ako.get_realtime_data(source=source, **kwargs)
+        
 
     df = _fetch_data_with_fallback(
         fetch_func=realtime_data_fetcher,
-        primary_source="eastmoney_direct",
-        fallback_sources=["eastmoney", "xueqiu"],
+        primary_source="xueqiu",
+        fallback_sources=["eastmoney", "eastmoney_direct"],
         symbol=symbol,
     )
     return _format_dataframe_output(df, output_format)
@@ -406,7 +410,23 @@ def get_financial_metrics(
     """
     获取三大财务报表的关键财务指标.
     """
-    df = ako.get_financial_metrics(symbol)
+    def get_get_financial_metrics_fetcher(source: str, **kwargs: Any) -> pd.DataFrame: 
+        if source == "sina":
+            return ak.stock_financial_abstract(**kwargs)
+        elif source == "ths":
+            return ak.stock_financial_abstract_ths(**kwargs,indicator="按报告期")
+        else:
+            return ako.get_financial_metrics(**kwargs)
+    
+    df = _fetch_data_with_fallback(
+        fetch_func=get_get_financial_metrics_fetcher,
+        primary_source="sina",
+        fallback_sources=[
+            "eastmoney_direct",
+            "ths"           
+        ],
+        symbol=symbol,
+    )
     if df.empty:
         df = pd.DataFrame()
     return _format_dataframe_output(df, output_format)
@@ -497,6 +517,8 @@ def get_macro_data(
             # 删除所有行值都为 null 的行
             df = df.dropna(axis=0, how='all')
             return df
+        
+        ak.stock_board_industry_name_ths()
 
         def get_macro_data_fetcher(
             indicator_name: str, **kwargs: Any
