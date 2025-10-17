@@ -13,6 +13,7 @@
 - **技术指标**: 30+ 种技术指标自动计算和添加
 - **新闻数据**: 股票相关新闻和公告信息
 - **易用性**: 简单配置即可集成到 AI 助手 (Claude、Cursor 等)
+- **数据缓存**: 内置内存和磁盘缓存机制，提高数据获取效率和响应速度
 - **容器化**: 支持 Docker 部署
 
 ## 🛠️ 架构概览
@@ -23,10 +24,11 @@
 - `__main__.py`: 命令行入口，支持多种运行模式
 - FastMCP 框架: 处理 MCP 协议通信
 - akshare-one 库: 提供底层的中国股市数据获取能力
+- `cache_utils.py`: 缓存工具，提供内存和磁盘缓存功能
 
 ### 支持的数据源
 
-- **数据源故障切换**: 内置 `_fetch_data_with_fallback` 机制，支持按优先级自动切换数据源，提高数据获取的稳定性和可靠性。
+- \*\*数据源故障切换\*\*: 内置 \`\_fetch\_data\_with\_fallback\` 机制，支持按优先级自动切换数据源。当首选数据源失败或返回空数据时，系统将自动尝试备用数据源，从而提高数据获取的稳定性和可靠性。
 
 - 东方财富 (eastmoney, eastmoney_direct)
 - 新浪财经 (sina)
@@ -44,12 +46,12 @@
 - `start_date` (string): 开始日期，格式为 YYYY-MM-DD
 - `end_date` (string): 结束日期，格式为 YYYY-MM-DD
 - `adjust` (Literal): 复权类型: none, qfq(前复权), hfq(后复权)。默认：none
-- `indicators_list` (string|list): 要添加的技术指标，可以是逗号分隔的字符串（例如: 'SMA,EMA'）或字符串列表（例如: ['SMA', 'EMA']）。支持的指标包括: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS_DI, MINUS_DM, PLUS_DI, PLUS_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC
+- \`indicators\_list\` \(string\|list\): 要添加的技术指标，可以是逗号分隔的字符串（例如: 'SMA,EMA'）或字符串列表（例如: \['SMA', 'EMA'\]）。支持的指标包括: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS\_DI, MINUS\_DM, PLUS\_DI, PLUS\_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC。常用指标：SMA, EMA, RSI, MACD, BOLL, STOCH, OBV, MFI,建议不超过10个。
 - `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
 
 ### 2. `获取股票的实时行情数据，支持多种数据源` (get_realtime_data)
 
-获取实时股票行情数据. 'eastmoney_direct'
+获取实时股票行情数据，支持的数据源包括：eastmoney, eastmoney\_direct, xueqiu。
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
@@ -165,8 +167,121 @@
 - `symbol` (string): 股票代码 (例如: '600519')
 - `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
 
-## 🚀 安装和运行
+### 17. `获取分红送股详情` (get_stock_fhps_detail)
 
+获取指定股票的分红送股详情数据。
+
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+### 18. `获取筹码分布数据` (get_stock_cyq)
+
+获取指定股票的筹码分布数据。
+
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `date` (string): 查询日期，格式为 YYYY-MM-DD
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+### 19. `获取股票研究报告` (get_stock_research_report)
+
+获取指定股票的研究报告数据。
+
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 20. `获取流通股东数据` (get_stock_circulate_stock_holder)
+
+获取指定股票的流通股东数据。
+
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 21. `获取高管变动数据` (get_stock_management_change)
+
+获取指定股票的高管变动数据。
+
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+
+### 22. `获取限售解禁数据` (get_stock_restricted_release_queue)
+
+获取指定股票的限售解禁数据。
+
+
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+
+
+### 23. `获取 A 股代码和名称` (get_stock_a_code_name)
+
+获取所有 A 股股票的代码和名称。
+
+**参数:**
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+
+### 24. `获取股票估值数据` (get_stock_value)
+
+获取指定股票的估值数据。
+
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 25. `计算指定个股的波动率指标` (get_stock_volatility)
+
+通过分钟级历史行情计算指定个股的波动率指标。
+**参数:**
+- `symbol` (string): 股票代码 (例如: '000001')
+- `start_date`(string): 开始日期
+- `end_date`(string): 结束日期
+- `period` (int): 时间周期，分钟级别 (例如: '1', '5', '15', '30', '60')")
+- `adjust`(string): 复权类型: none, qfq(前复权), hfq(后复权)。默认：none
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 26. `获取所有指数的代码和基本信息` (get_all_cni_indices)
+
+获取所有指数的代码和基本信息，去除实时变动数据并支持缓存。
+
+**参数:**
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 27. `获取指定指数的日频率历史行情数据` (get_cni_index_hist)
+
+获取指定指数的日频率历史行情数据。
+
+**参数:**
+- `symbol` (string): 指数代码 (例如: '399005')
+- `start_date` (string): 开始日期，格式为 YYYYMMDD (例如: '20230114')
+- `end_date` (string): 结束日期，格式为 YYYYMMDD (例如: '20240114')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 28. `获取指定指数的成分股样本详情` (get_cni_index_detail)
+
+获取指定指数的成分股样本详情。
+
+**参数:**
+- `symbol` (string): 指数代码 (例如: '399001')
+- `date` (string): 日期，格式为 YYYYMM (例如: '202404')
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 29. `获取技术选股指标数据，包括创新高、创新低、连续上涨、连续下跌、持续放量、持续缩量、向上突破、向下突破、量价齐升、量价齐跌、险资举牌。`(get_stock_technical_rank)
+
+**参数:**
+- `indicator_name` (string): 要获取的技术指标名称 (例如: 创新高-创月新高,  创新高-半年新高,  创新高-一年新高,  创新高-历史新高,  创新低-创月新低,  创新低-半年新低,  创新低-一年新低,  创新低-历史新低,  连续上涨,  连续下跌,  持续放量,  持续缩量,  向上突破-5日均线,  向上突破-10日均线,  向上突破-20日均线,  向上突破-30日均线,  向上突破-60日均线,  向上突破-90日均线,  向上突破-250日均线,  向上突破-500日均线,  向下突破-5日均线,  向下突破-10日均线,  向下突破-20日均线,  向下突破-30日均线,  向下突破-60日均线,  向下突破-90日均线,  向下突破-250日均线,  向下突破-500日均线,  量价齐升,  量价齐跌,  险资举牌)
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+### 30. `获取所有行业板块实时行情数据` (get_stock_board_industry_summary)
+**参数:**
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+
+## 🚀 安装和运行
 ### 方法一: 使用 Smithery
 
 通过 [Smithery](https://smithery.ai/server/@xinkuang/china-stock-mcp) 自动安装到 Claude Desktop：

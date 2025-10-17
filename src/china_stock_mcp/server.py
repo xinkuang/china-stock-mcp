@@ -9,6 +9,7 @@ import pandas as pd
 from akshare_one import indicators
 from fastmcp import FastMCP
 from pydantic import Field
+from .cache_utils import cached_data_fetch
 
 
 def _fetch_data_with_fallback(
@@ -119,8 +120,10 @@ def _format_dataframe_output(
 mcp = FastMCP(name="china-stock-mcp")  # 初始化 FastMCP 服务器实例
 
 
+
+
 @mcp.tool(
-    name="get_hist_data", description="获取股票的历史行情数据，支持多种数据源和技术指标"
+    name="get_hist_data", description="获取指定的股票历史行情数据及技术指标"
 )
 def get_hist_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
@@ -283,7 +286,7 @@ def get_hist_data(
     return _format_dataframe_output(df, output_format)
 
 @mcp.tool(
-    name="get_realtime_data", description="获取股票的实时行情数据，支持多种数据源"
+    name="get_realtime_data", description="获取指定的股票实时行情数据"
 )
 def get_realtime_data(
    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
@@ -296,16 +299,13 @@ def get_realtime_data(
 
     # 定义内部 fetch_func
     def realtime_data_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
-        if source == "xueqiu":
-            return ak.stock_individual_spot_xq(**kwargs)
-        else:
-            return ako.get_realtime_data(source=source, **kwargs)
+        return ako.get_realtime_data(source=source, **kwargs)
         
 
     df = _fetch_data_with_fallback(
         fetch_func=realtime_data_fetcher,
-        primary_source="xueqiu",
-        fallback_sources=["eastmoney", "eastmoney_direct"],
+        primary_source="eastmoney",
+        fallback_sources=["eastmoney_direct","xueqiu"],
         symbol=symbol,
     )
     return _format_dataframe_output(df, output_format)
@@ -325,7 +325,7 @@ def get_news_data(
     return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_balance_sheet", description="获取公司的资产负债表数据")
+@mcp.tool(name="get_balance_sheet", description="获取公司的资产负债表")
 def get_balance_sheet(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
@@ -340,7 +340,7 @@ def get_balance_sheet(
     return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_income_statement", description="获取指定股票代码的公司的利润表数据")
+@mcp.tool(name="get_income_statement", description="获取指定股票代码的公司的利润表")
 def get_income_statement(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
@@ -355,7 +355,7 @@ def get_income_statement(
     return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_cash_flow", description="获取指定股票代码的公司的现金流量表数据")
+@mcp.tool(name="get_cash_flow", description="获取指定股票代码的公司的现金流量表")
 def get_cash_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
@@ -370,7 +370,7 @@ def get_cash_flow(
     return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_fund_flow", description="获取股票的近 100 个交易日的资金流向数据")
+@mcp.tool(name="get_fund_flow", description="获取股票资金流向数据 (近100交易日)")
 def get_fund_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
@@ -384,7 +384,7 @@ def get_fund_flow(
         df = pd.DataFrame()
     return _format_dataframe_output(df, output_format)
 
-@mcp.tool(name="get_inner_trade_data", description="获取公司的内部股东交易数据")
+@mcp.tool(name="get_inner_trade_data", description="获取公司内部股东交易数据")
 def get_inner_trade_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
@@ -399,7 +399,7 @@ def get_inner_trade_data(
     return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_financial_metrics", description="获取三大财务报表的关键财务指标")
+@mcp.tool(name="get_financial_metrics", description="获取公司关键财务指标")
 def get_financial_metrics(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
@@ -493,6 +493,7 @@ def get_stock_basic_info(
         df = pd.DataFrame()
     return _format_dataframe_output(df, output_format)
 
+
 @mcp.tool(name="get_macro_data", description="获取单个宏观经济指标数据")
 def get_macro_data(    
     indicator: Annotated[
@@ -518,8 +519,7 @@ def get_macro_data(
             df = df.dropna(axis=0, how='all')
             return df
         
-        ak.stock_board_industry_name_ths()
-
+        @cached_data_fetch()
         def get_macro_data_fetcher(
             indicator_name: str, **kwargs: Any
         ) -> pd.DataFrame:
@@ -534,7 +534,8 @@ def get_macro_data(
             elif indicator_name == "stock_summary":           
                 df = ak.macro_china_stock_market_cap()    
             return df
-
+        
+     
         df = get_macro_data_fetcher(indicator)
         if df is not None and not df.empty:
             df = _clean_macro_data(df)
@@ -545,7 +546,7 @@ def get_macro_data(
         return _format_dataframe_output(df, output_format)
    
 
-@mcp.tool(name="get_investor_sentiment", description="分析散户和机构投资者的投资情绪")
+@mcp.tool(name="get_investor_sentiment", description="分析投资者情绪数据，包括用户关注指数、日度市场参与意愿、股票评级记录和机构参与度。")
 def get_investor_sentiment(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],  
     output_format: Annotated[
@@ -623,7 +624,7 @@ def get_shareholder_info(
     return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_product_info", description="获取指定股票公司的主要产品或业务构成")
+@mcp.tool(name="get_product_info", description="获取公司主要产品/业务构成")
 def get_product_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")], 
     output_format: Annotated[
@@ -676,5 +677,460 @@ def get_profit_forecast(
     if df_list:
             df = pd.concat(df_list, ignore_index=True)
     else:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+@mcp.tool(
+    name="get_stock_fhps_detail", description="获取指定股票的分红配送情况"
+)
+def get_stock_fhps_detail(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定股票的分红配送情况，支持降级使用 stock_fhps_detail_ths 和 stock_dividend_cninfo."""
+    def _fhps_detail_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        if source == "em":
+            return ak.stock_fhps_detail_em(**kwargs)
+        elif source == "ths":
+            return ak.stock_fhps_detail_ths(**kwargs)
+        elif source == "cninfo":           
+            return ak.stock_dividend_cninfo(symbol=kwargs["symbol"])
+        else:
+            raise ValueError(f"不支持的数据源: {source}")
+
+    df = _fetch_data_with_fallback(
+        fetch_func=_fhps_detail_fetcher,
+        primary_source="em",
+        fallback_sources=["ths", "cninfo"],
+        symbol=symbol,
+    )     
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+@mcp.tool(
+    name="get_stock_cyq", description="获取指定股票的筹码分布情况"
+)
+def get_stock_cyq(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定股票的筹码分布情况."""
+    df = ak.stock_cyq_em(symbol=symbol)
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+@mcp.tool(
+    name="get_stock_research_report", description="获取指定股票的个股研报及盈利预测"
+)
+def get_stock_research_report(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定股票的个股研报及盈利预测."""
+    df = ak.stock_research_report_em(symbol=symbol)
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+
+
+@mcp.tool(
+    name="get_stock_circulate_stock_holder", description="获取指定股票的流通股东情况"
+)
+def get_stock_circulate_stock_holder(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定股票的流通股东情况，支持降级使用 stock_main_stock_holder."""
+
+    def _circulate_stock_holder_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        if source == "akshare":
+            return ak.stock_circulate_stock_holder(**kwargs)
+        elif source == "main_stock_holder":
+            return ak.stock_main_stock_holder(**kwargs)
+        else:
+            raise ValueError(f"不支持的数据源: {source}")
+
+    df = _fetch_data_with_fallback(
+        fetch_func=_circulate_stock_holder_fetcher,
+        primary_source="akshare",
+        fallback_sources=["main_stock_holder"],
+        symbol=symbol,
+    )
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+
+
+
+@mcp.tool(
+    name="get_stock_management_change", description="获取指定股票的高管持股变动情况"
+)
+def get_stock_management_change(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定股票的高管持股变动情况，支持降级使用 stock_shareholder_change_ths、stock_share_hold_change_szse、stock_share_hold_change_bse."""
+
+    def _management_change_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        if source == "ths":
+            return ak.stock_management_change_ths(**kwargs)
+        elif source == "shareholder_change_ths":
+            return ak.stock_shareholder_change_ths(**kwargs)
+        
+        else:
+            raise ValueError(f"不支持的数据源: {source}")
+
+    df = _fetch_data_with_fallback(
+        fetch_func=_management_change_fetcher,
+        primary_source="ths",
+        fallback_sources=["shareholder_change_ths"],
+        symbol=symbol,
+    )
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+
+
+
+@mcp.tool(
+    name="get_stock_restricted_release_queue", description="获取指定股票的个股限售解禁情况"
+)
+def get_stock_restricted_release_queue(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定股票的个股限售解禁情况，支持降级使用 stock_restricted_release_queue_em."""
+
+    def _restricted_release_queue_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
+        if source == "sina":
+            return ak.stock_restricted_release_queue_sina(**kwargs)
+        elif source == "em":
+            return ak.stock_restricted_release_queue_em(**kwargs)
+        else:
+            raise ValueError(f"不支持的数据源: {source}")
+
+    df = _fetch_data_with_fallback(
+        fetch_func=_restricted_release_queue_fetcher,
+        primary_source="sina",
+        fallback_sources=["em"],
+        symbol=symbol,
+    )
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+
+
+
+@mcp.tool(
+    name="get_stock_value", description="获取指定股票的个股估值分析数据"
+)
+def get_stock_value(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定股票的个股估值分析数据."""
+    df = ak.stock_value_em(symbol=symbol)
+    if df.empty:
+        df = pd.DataFrame()
+
+    return _format_dataframe_output(df, output_format)
+
+@mcp.tool(
+    name="get_stock_a_code_name", description="获取沪深京 A 股股票代码和股票简称数据"
+)
+def get_stock_a_code_name(
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取沪深京 A 股股票代码和股票简称数据."""
+    
+    @cached_data_fetch()
+    def get_stock_a_code_name_fetch() -> pd.DataFrame:
+        return ak.stock_info_a_code_name()
+    
+    df = get_stock_a_code_name_fetch()
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+
+@mcp.tool(
+    name="get_stock_volatility", description="通过分钟级历史行情计算指定个股的波动率指标"
+)
+def get_stock_volatility(
+    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
+    start_date: Annotated[
+        str, Field(description="开始日期，格式为 YYYY-MM-DD HH:MM:SS (例如: '2021-10-20 09:30:00')")
+    ],
+    end_date: Annotated[
+        str, Field(description="结束日期，格式为 YYYY-MM-DD HH:MM:SS (例如: '2024-11-01 15:00:00')")
+    ],
+    period: Annotated[
+        Literal["1", "5", "15", "30", "60"],
+        Field(description="分钟级历史行情时间周期，分钟级别 (例如: '1', '5', '15', '30', '60')"),
+    ],
+    adjust: Annotated[
+        Literal["none", "qfq", "hfq"],
+        Field(description="复权类型: none, qfq(前复权), hfq(后复权)。默认：none"),
+    ] = "none",
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """计算指定个股的已实现波动率指标."""
+    stock_df = ak.rv_from_stock_zh_a_hist_min_em(
+        symbol=symbol,
+        start_date=start_date,
+        end_date=end_date,
+        period=period,
+        adjust=adjust,
+    )
+    if stock_df.empty:
+        return _format_dataframe_output(pd.DataFrame(), output_format)
+
+    volatility_yz_rv_df = ak.volatility_yz_rv(data=stock_df)
+   
+    return _format_dataframe_output(volatility_yz_rv_df, output_format)
+
+
+@mcp.tool(
+    name="get_all_cni_indices", description="获取所有指数的代码和基本信息"
+)
+def get_all_cni_indices(
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取所有指数的代码和基本信息"""
+
+    @cached_data_fetch()
+    def _fetch_all_cni_indices() -> pd.DataFrame:
+        df = ak.index_all_cni()
+        # 去除实时变动数据
+        columns_to_drop = [
+            "收盘点位",
+            "涨跌幅",
+            "PE滚动",
+            "成交量",
+            "成交额",
+            "总市值",
+            "自由流通市值",
+        ]
+        df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
+        return df
+
+    df = _fetch_all_cni_indices()
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+@mcp.tool(
+    name="get_cni_index_hist", description="获取指定指数的日频率历史行情数据"
+)
+def get_cni_index_hist(
+    symbol: Annotated[str, Field(description="指数代码 (例如: '399005')")],
+    start_date: Annotated[str, Field(description="开始日期，格式为 YYYYMMDD (例如: '20230114')")],
+    end_date: Annotated[str, Field(description="结束日期，格式为 YYYYMMDD (例如: '20240114')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定指数的日频率历史行情数据."""
+    df = ak.index_hist_cni(symbol=symbol, start_date=start_date, end_date=end_date)
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+
+@mcp.tool(
+    name="get_cni_index_detail", description="获取指定指数的成分股样本详情"
+)
+def get_cni_index_detail(
+    symbol: Annotated[str, Field(description="指数代码 (例如: '399001')")],
+    date: Annotated[str, Field(description="日期，格式为 YYYYMM (例如: '202404')")],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取指定指数的成分股样本详情."""
+    df = ak.index_detail_cni(symbol=symbol, date=date)
+    if df.empty:
+        df = pd.DataFrame()
+    return _format_dataframe_output(df, output_format)
+
+@mcp.tool(
+    name="get_stock_technical_rank", description="获取技术选股指标数据，包括创新高、创新低、连续上涨、连续下跌、持续放量、持续缩量、向上突破、向下突破、量价齐升、量价齐跌、险资举牌。"
+)
+def get_stock_technical_rank(
+    indicator_name: Annotated[
+        Literal[
+            "创新高-创月新高",
+            "创新高-半年新高",
+            "创新高-一年新高",
+            "创新高-历史新高",
+            "创新低-创月新低",
+            "创新低-半年新低",
+            "创新低-一年新低",
+            "创新低-历史新低",
+            "连续上涨",
+            "连续下跌",
+            "持续放量",
+            "持续缩量",
+            "向上突破-5日均线",
+            "向上突破-10日均线",
+            "向上突破-20日均线",
+            "向上突破-30日均线",
+            "向上突破-60日均线",
+            "向上突破-90日均线",
+            "向上突破-250日均线",
+            "向上突破-500日均线",
+            "向下突破-5日均线",
+            "向下突破-10日均线",
+            "向下突破-20日均线",
+            "向下突破-30日均线",
+            "向下突破-60日均线",
+            "向下突破-90日均线",
+            "向下突破-250日均线",
+            "向下突破-500日均线",
+            "量价齐升",
+            "量价齐跌",
+            "险资举牌",
+        ],
+        Field(description="要获取的技术指标名称"),
+    ],
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """根据指定的指标名称获取同花顺技术选股数据。"""
+    df = pd.DataFrame()
+    
+    if indicator_name.startswith("创新高"):
+        symbol_map = {
+            "创新高-创月新高": "创月新高",
+            "创新高-半年新高": "半年新高",
+            "创新高-一年新高": "一年新高",
+            "创新高-历史新高": "历史新高",
+        }
+        symbol_param = symbol_map.get(indicator_name)
+        if symbol_param:
+            df = ak.stock_rank_cxg_ths(symbol=symbol_param)
+    elif indicator_name.startswith("创新低"):
+        symbol_map = {
+            "创新低-创月新低": "创月新低",
+            "创新低-半年新低": "半年新低",
+            "创新低-一年新低": "一年新低",
+            "创新低-历史新低": "历史新低",
+        }
+        symbol_param = symbol_map.get(indicator_name)
+        if symbol_param:
+            df = ak.stock_rank_cxd_ths(symbol=symbol_param)
+    elif indicator_name == "连续上涨":
+        df = ak.stock_rank_lxsz_ths()
+    elif indicator_name == "连续下跌":
+        df = ak.stock_rank_lxxd_ths()
+    elif indicator_name == "持续放量":
+        df = ak.stock_rank_cxfl_ths()
+    elif indicator_name == "持续缩量":
+        df = ak.stock_rank_cxsl_ths()
+    elif indicator_name.startswith("向上突破"):
+        symbol_map = {
+            "向上突破-5日均线": "5日均线",
+            "向上突破-10日均线": "10日均线",
+            "向上突破-20日均线": "20日均线",
+            "向上突破-30日均线": "30日均线",
+            "向上突破-60日均线": "60日均线",
+            "向上突破-90日均线": "90日均线",
+            "向上突破-250日均线": "250日均线",
+            "向上突破-500日均线": "500日均线",
+        }
+        symbol_param = symbol_map.get(indicator_name)
+        if symbol_param:
+            df = ak.stock_rank_xstp_ths(symbol=symbol_param)
+    elif indicator_name.startswith("向下突破"):
+        symbol_map = {
+            "向下突破-5日均线": "5日均线",
+            "向下突破-10日均线": "10日均线",
+            "向下突破-20日均线": "20日均线",
+            "向下突破-30日均线": "30日均线",
+            "向下突破-60日均线": "60日均线",
+            "向下突破-90日均线": "90日均线",
+            "向下突破-250日均线": "250日均线",
+            "向下突破-500日均线": "500日均线",
+        }
+        symbol_param = symbol_map.get(indicator_name)
+        if symbol_param:
+            df = ak.stock_rank_xxtp_ths(symbol=symbol_param)
+    elif indicator_name == "量价齐升":
+        df = ak.stock_rank_ljqs_ths()
+    elif indicator_name == "量价齐跌":
+        df = ak.stock_rank_ljqd_ths()
+    elif indicator_name == "险资举牌":
+        df = ak.stock_rank_xzjp_ths()
+    
+    if df.empty:
+        df = pd.DataFrame()
+
+    return _format_dataframe_output(df, output_format)
+
+
+@mcp.tool(
+    name="get_stock_board_industry_summary", description="获取所有行业板块实时行情数据"
+)
+def get_stock_board_industry_summary(
+    output_format: Annotated[
+        Literal["json", "csv", "xml", "excel", "markdown", "html"],
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
+    ] = "json",
+) -> str:
+    """获取同花顺行业板块实时行情数据."""
+    def _fetch_stock_board_industry_summary_ths() -> pd.DataFrame:
+        return ak.stock_board_industry_summary_ths()
+
+    df = _fetch_stock_board_industry_summary_ths()
+    if df.empty:
         df = pd.DataFrame()
     return _format_dataframe_output(df, output_format)

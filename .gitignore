@@ -11,3 +11,5 @@ wheels/
 
 .vscode/
 .roo/
+cache_data/
+tests/

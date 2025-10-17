@@ -1,6 +1,7 @@
 uvicorn>=0.37.0
 starlette>=0.47.3
 fastmcp>=2.12.4
-akshare>=1.17.42
+akshare>=1.17.67
 akshare-one>=0.3.12
 openpyxl
+pyarrow
