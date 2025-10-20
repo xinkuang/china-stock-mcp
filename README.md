@@ -47,7 +47,7 @@
 - `end_date` (string): 结束日期，格式为 YYYY-MM-DD
 - `adjust` (Literal): 复权类型: none, qfq(前复权), hfq(后复权)。默认：none
 - \`indicators\_list\` \(string\|list\): 要添加的技术指标，可以是逗号分隔的字符串（例如: 'SMA,EMA'）或字符串列表（例如: \['SMA', 'EMA'\]）。支持的指标包括: SMA, EMA, RSI, MACD, BOLL, STOCH, ATR, CCI, ADX, WILLR, AD, ADOSC, OBV, MOM, SAR, TSF, APO, AROON, AROONOSC, BOP, CMO, DX, MFI, MINUS\_DI, MINUS\_DM, PLUS\_DI, PLUS\_DM, PPO, ROC, ROCP, ROCR, ROCR100, TRIX, ULTOSC。常用指标：SMA, EMA, RSI, MACD, BOLL, STOCH, OBV, MFI,建议不超过10个。
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 2. `获取股票的实时行情数据，支持多种数据源` (get_realtime_data)
 
@@ -55,7 +55,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 3. `获取股票相关的新闻数据` (get_news_data)
 
@@ -63,7 +63,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 4. `获取公司的资产负债表数据` (get_balance_sheet)
 
@@ -71,7 +71,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 5. `获取指定股票代码的公司的利润表数据` (get_income_statement)
 
@@ -79,7 +79,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 6. `获取指定股票代码的公司的现金流量表数据` (get_cash_flow)
 
@@ -87,7 +87,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 7. `获取股票的近 100 个交易日的资金流向数据` (get_fund_flow)
 
@@ -95,7 +95,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 8. `获取公司的内部股东交易数据` (get_inner_trade_data)
 
@@ -103,7 +103,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 9. `获取三大财务报表的关键财务指标` (get_financial_metrics)
 
@@ -111,7 +111,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 10. `获取当前时间（ISO格式、时间戳）和最近一个交易日` (get_time_info)
 
@@ -125,7 +125,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 12. `获取单个宏观经济指标数据` (get_macro_data)
 
@@ -133,7 +133,7 @@
 
 **参数:**
 - `indicator` (Literal): 要获取的宏观经济指标。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: 'gdp'
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 13. `分析散户和机构投资者的投资情绪` (get_investor_sentiment)
 
@@ -141,7 +141,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 14. `获取指定股票的股东情况` (get_shareholder_info)
 
@@ -149,7 +149,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 15. `获取指定股票公司的主要产品或业务构成` (get_product_info)
 
@@ -157,7 +157,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 16. `获取股票的业绩预测数据，包括预测年报净利润和每股收益` (get_profit_forecast)
 
@@ -165,7 +165,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '600519')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 17. `获取分红送股详情` (get_stock_fhps_detail)
 
@@ -173,7 +173,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 ### 18. `获取筹码分布数据` (get_stock_cyq)
 
 获取指定股票的筹码分布数据。
@@ -181,14 +181,14 @@
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
 - `date` (string): 查询日期，格式为 YYYY-MM-DD
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 ### 19. `获取股票研究报告` (get_stock_research_report)
 
 获取指定股票的研究报告数据。
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 20. `获取流通股东数据` (get_stock_circulate_stock_holder)
 
@@ -196,7 +196,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 21. `获取高管变动数据` (get_stock_management_change)
 
@@ -204,7 +204,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 
 ### 22. `获取限售解禁数据` (get_stock_restricted_release_queue)
@@ -214,7 +214,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 
 
@@ -223,7 +223,7 @@
 获取所有 A 股股票的代码和名称。
 
 **参数:**
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 
 ### 24. `获取股票估值数据` (get_stock_value)
@@ -232,7 +232,7 @@
 
 **参数:**
 - `symbol` (string): 股票代码 (例如: '000001')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 25. `计算指定个股的波动率指标` (get_stock_volatility)
 
@@ -243,14 +243,14 @@
 - `end_date`(string): 结束日期
 - `period` (int): 时间周期，分钟级别 (例如: '1', '5', '15', '30', '60')")
 - `adjust`(string): 复权类型: none, qfq(前复权), hfq(后复权)。默认：none
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 26. `获取所有指数的代码和基本信息` (get_all_cni_indices)
 
 获取所有指数的代码和基本信息，去除实时变动数据并支持缓存。
 
 **参数:**
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 27. `获取指定指数的日频率历史行情数据` (get_cni_index_hist)
 
@@ -260,7 +260,7 @@
 - `symbol` (string): 指数代码 (例如: '399005')
 - `start_date` (string): 开始日期，格式为 YYYYMMDD (例如: '20230114')
 - `end_date` (string): 结束日期，格式为 YYYYMMDD (例如: '20240114')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 28. `获取指定指数的成分股样本详情` (get_cni_index_detail)
 
@@ -269,17 +269,17 @@
 **参数:**
 - `symbol` (string): 指数代码 (例如: '399001')
 - `date` (string): 日期，格式为 YYYYMM (例如: '202404')
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 29. `获取技术选股指标数据，包括创新高、创新低、连续上涨、连续下跌、持续放量、持续缩量、向上突破、向下突破、量价齐升、量价齐跌、险资举牌。`(get_stock_technical_rank)
 
 **参数:**
 - `indicator_name` (string): 要获取的技术指标名称 (例如: 创新高-创月新高,  创新高-半年新高,  创新高-一年新高,  创新高-历史新高,  创新低-创月新低,  创新低-半年新低,  创新低-一年新低,  创新低-历史新低,  连续上涨,  连续下跌,  持续放量,  持续缩量,  向上突破-5日均线,  向上突破-10日均线,  向上突破-20日均线,  向上突破-30日均线,  向上突破-60日均线,  向上突破-90日均线,  向上突破-250日均线,  向上突破-500日均线,  向下突破-5日均线,  向下突破-10日均线,  向下突破-20日均线,  向下突破-30日均线,  向下突破-60日均线,  向下突破-90日均线,  向下突破-250日均线,  向下突破-500日均线,  量价齐升,  量价齐跌,  险资举牌)
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ### 30. `获取所有行业板块实时行情数据` (get_stock_board_industry_summary)
 **参数:**
-- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认: json
+- `output_format` (Literal): 输出数据格式: json, csv, xml, excel, markdown, html。默认:markdown
 
 ## 🚀 安装和运行
 ### 方法一: 使用 Smithery

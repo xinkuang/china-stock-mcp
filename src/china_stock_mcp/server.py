@@ -187,8 +187,8 @@ def get_hist_data(
     ] = "SMA, EMA, RSI, MACD, BOLL, STOCH, OBV, MFI",
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取股票历史行情数据."""
 
@@ -292,8 +292,8 @@ def get_realtime_data(
    symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取实时股票行情数据. 'eastmoney_direct' """
 
@@ -317,8 +317,8 @@ def get_news_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取股票相关新闻数据."""
     df = ako.get_news_data(symbol=symbol, source="eastmoney")
@@ -330,8 +330,8 @@ def get_balance_sheet(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取公司资产负债表数据."""
     df = ako.get_balance_sheet(symbol=symbol, source="sina")
@@ -345,8 +345,8 @@ def get_income_statement(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json"
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取公司利润表数据."""
     df = ako.get_income_statement(symbol=symbol, source="sina")
@@ -360,8 +360,8 @@ def get_cash_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取公司现金流量表数据."""
     df = ako.get_cash_flow(symbol=symbol, source="sina")
@@ -375,8 +375,8 @@ def get_fund_flow(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:   
     market = _get_market_from_symbol(symbol)
     df = ak.stock_individual_fund_flow(stock=symbol, market=market)
@@ -389,8 +389,8 @@ def get_inner_trade_data(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取公司内部股东交易数据."""
     df = ako.get_inner_trade_data(symbol, source="xueqiu")
@@ -404,8 +404,8 @@ def get_financial_metrics(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """
     获取三大财务报表的关键财务指标.
@@ -462,8 +462,8 @@ def get_stock_basic_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取股票基本概要信息，支持 A 股和港股"""
 
@@ -494,16 +494,20 @@ def get_stock_basic_info(
     return _format_dataframe_output(df, output_format)
 
 
-@mcp.tool(name="get_macro_data", description="获取单个宏观经济指标数据")
+@mcp.tool(name="get_macro_data", description="获取宏观经济指标数据，支持多个指标")
 def get_macro_data(    
     indicator: Annotated[
-        Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"],
-        Field(description="要获取的宏观经济指标。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: 'gdp'"),
+        str | list[
+            Literal["money_supply", "gdp", "cpi", "pmi", "stock_summary"]
+        ] | None,
+        Field(
+            description="要获取的宏观经济指标，可以是逗号分隔的字符串（例如: 'gdp,cpi'）或字符串列表（例如: ['gdp', 'cpi']）。支持的指标包括: money_supply, gdp, cpi, pmi, stock_summary。默认: 'gdp'"
+        ),
     ] = "gdp",
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json"
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
     ) -> str:
         """获取宏观经济数据"""
 
@@ -519,29 +523,62 @@ def get_macro_data(
             df = df.dropna(axis=0, how='all')
             return df
         
+        macro_indicator_map = {
+            "money_supply": ak.macro_china_money_supply,
+            "gdp": ak.macro_china_gdp_yearly,
+            "cpi": ak.macro_china_cpi_yearly,
+            "pmi": ak.macro_china_pmi_yearly,
+            "stock_summary": ak.macro_china_stock_market_cap,
+        }
+
         @cached_data_fetch()
         def get_macro_data_fetcher(
             indicator_name: str, **kwargs: Any
         ) -> pd.DataFrame:
-            if indicator_name == "money_supply":           
-                df = ak.macro_china_money_supply()
-            elif indicator_name == "gdp":
-                df = ak.macro_china_gdp_yearly()
-            elif indicator_name == "cpi":
-                df = ak.macro_china_cpi_yearly()
-            elif indicator_name == "pmi":
-                df = ak.macro_china_pmi_yearly()
-            elif indicator_name == "stock_summary":           
-                df = ak.macro_china_stock_market_cap()    
-            return df
+            fetch_func = macro_indicator_map.get(indicator_name)
+            if fetch_func:
+                return fetch_func(**kwargs)
+            else:
+                raise ValueError(f"不支持的宏观经济指标: {indicator_name}")
         
-     
-        df = get_macro_data_fetcher(indicator)
-        if df is not None and not df.empty:
-            df = _clean_macro_data(df)
-            df['indicator'] = indicator # 添加指标名称列
+        if indicator is None:
+            indicator_list = ["gdp"] # 默认指标
+        elif isinstance(indicator, str):
+            indicator_list = [
+                ind.strip()
+                for ind in indicator.split(",")
+                if ind.strip()
+            ]
+        else: # 假设是 list[Literal[...]]
+            indicator_list = indicator
+        
+        # 过滤掉无效的指标
+        valid_indicators = []
+        for ind in indicator_list:
+            if ind in macro_indicator_map:
+                valid_indicators.append(ind)
+            else:
+                print(f"警告: 宏观经济指标 '{ind}' 不存在，将被忽略。")
+        
+        if not valid_indicators:
+            print("警告: 未找到有效的宏观经济指标，将返回空数据。")
+            return _format_dataframe_output(pd.DataFrame(), output_format)
+
+        df_list = []
+        for ind in valid_indicators:
+            try:
+                temp_df = get_macro_data_fetcher(ind)
+                if temp_df is not None and not temp_df.empty:
+                    temp_df = _clean_macro_data(temp_df)
+                    temp_df['indicator'] = ind # 添加指标名称列
+                    df_list.append(temp_df)
+            except Exception as e:
+                print(f"获取宏观经济指标 '{ind}' 失败: {e}")
+        
+        if df_list:
+            df = pd.concat(df_list, ignore_index=True)
         else:
-            df = pd.DataFrame() # 如果没有获取到数据，返回空的DataFrame
+            df = pd.DataFrame() # 如果没有获取到任何数据，返回空的DataFrame
             
         return _format_dataframe_output(df, output_format)
    
@@ -551,8 +588,8 @@ def get_investor_sentiment(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],  
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json", 
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown" 
 ) -> str:
     """分析散户和机构投资者的投资情绪"""
     
@@ -602,14 +639,13 @@ def get_investor_sentiment(
     return _format_dataframe_output(df, output_format)
 
 
-
 @mcp.tool(name="get_shareholder_info", description="获取指定股票的股东情况")
 def get_shareholder_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")]  ,
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取股东情况"""
     def get_shareholder_info_fetcher(
@@ -629,8 +665,8 @@ def get_product_info(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")], 
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",  
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"  
 ) -> str:
     """获取产品情况"""
     def get_product_info_fetcher(
@@ -660,8 +696,8 @@ def get_profit_forecast(
     symbol: Annotated[str, Field(description="股票代码 (例如: '600519')")],   
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """
     获取股票的业绩预测数据。
@@ -688,8 +724,8 @@ def get_stock_fhps_detail(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定股票的分红配送情况，支持降级使用 stock_fhps_detail_ths 和 stock_dividend_cninfo."""
     def _fhps_detail_fetcher(source: str, **kwargs: Any) -> pd.DataFrame:
@@ -720,8 +756,8 @@ def get_stock_cyq(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定股票的筹码分布情况."""
     df = ak.stock_cyq_em(symbol=symbol)
@@ -737,8 +773,8 @@ def get_stock_research_report(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定股票的个股研报及盈利预测."""
     df = ak.stock_research_report_em(symbol=symbol)
@@ -756,8 +792,8 @@ def get_stock_circulate_stock_holder(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定股票的流通股东情况，支持降级使用 stock_main_stock_holder."""
 
@@ -790,8 +826,8 @@ def get_stock_management_change(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定股票的高管持股变动情况，支持降级使用 stock_shareholder_change_ths、stock_share_hold_change_szse、stock_share_hold_change_bse."""
 
@@ -825,8 +861,8 @@ def get_stock_restricted_release_queue(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定股票的个股限售解禁情况，支持降级使用 stock_restricted_release_queue_em."""
 
@@ -859,8 +895,8 @@ def get_stock_value(
     symbol: Annotated[str, Field(description="股票代码 (例如: '000001')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定股票的个股估值分析数据."""
     df = ak.stock_value_em(symbol=symbol)
@@ -875,8 +911,8 @@ def get_stock_value(
 def get_stock_a_code_name(
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取沪深京 A 股股票代码和股票简称数据."""
     
@@ -912,8 +948,8 @@ def get_stock_volatility(
     ] = "none",
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """计算指定个股的已实现波动率指标."""
     stock_df = ak.rv_from_stock_zh_a_hist_min_em(
@@ -937,8 +973,8 @@ def get_stock_volatility(
 def get_all_cni_indices(
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取所有指数的代码和基本信息"""
 
@@ -973,8 +1009,8 @@ def get_cni_index_hist(
     end_date: Annotated[str, Field(description="结束日期，格式为 YYYYMMDD (例如: '20240114')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定指数的日频率历史行情数据."""
     df = ak.index_hist_cni(symbol=symbol, start_date=start_date, end_date=end_date)
@@ -991,8 +1027,8 @@ def get_cni_index_detail(
     date: Annotated[str, Field(description="日期，格式为 YYYYMM (例如: '202404')")],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取指定指数的成分股样本详情."""
     df = ak.index_detail_cni(symbol=symbol, date=date)
@@ -1042,8 +1078,8 @@ def get_stock_technical_rank(
     ],
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """根据指定的指标名称获取同花顺技术选股数据。"""
     df = pd.DataFrame()
@@ -1123,8 +1159,8 @@ def get_stock_technical_rank(
 def get_stock_board_industry_summary(
     output_format: Annotated[
         Literal["json", "csv", "xml", "excel", "markdown", "html"],
-        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: json"),
-    ] = "json",
+        Field(description="输出数据格式: json, csv, xml, excel, markdown, html。默认: markdown"),
+    ] = "markdown"
 ) -> str:
     """获取同花顺行业板块实时行情数据."""
     def _fetch_stock_board_industry_summary_ths() -> pd.DataFrame:
